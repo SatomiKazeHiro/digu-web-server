@@ -5,7 +5,7 @@ const express = require("express");
 const webRouter = express.Router();
 
 // 中间件
-const { webMiddleware } = require('../middleware/router');
+let { webMiddleware } = require('../middleware/router');
 
 
 webRouter.get('/:area', webMiddleware, (req, res) => {
@@ -20,4 +20,4 @@ webRouter.get('/:area/:category/:itemId', webMiddleware, (req, res) => {
   res.send(req.params);
 })
 
-module.exports = webRouter;
+module.exports.webRouter = webRouter;

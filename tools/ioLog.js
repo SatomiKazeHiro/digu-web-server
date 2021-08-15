@@ -7,7 +7,7 @@ const { appendFileSync } = require('fs');
 // 自定义打印加追加文本方法
 /**
  * 输出log并保存log信息
- * @param {String} path i/o log配置文件的路径
+ * @param {String} path i/o 系统log配置文件的路径
  * @param {String} msg 需要输出的信息
  * @param {String} type 输出信息类型
  */

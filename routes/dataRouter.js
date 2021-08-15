@@ -9,10 +9,10 @@ const fs = require("fs");
 const dataRouter = express.Router();
 
 // 资源初始化
-const { init_area, init_category, init_item } = require("../tools/init");
+let { initArea, initCategory, initItem } = require("../tools/init");
 
 // 路由中间件
-const { dataMiddleware } = require('../middleware/router');
+let { dataMiddleware } = require('../middleware/router');
 
 
 dataRouter.get('/:area', dataMiddleware, (req, res) => {
@@ -22,22 +22,22 @@ dataRouter.get('/:area', dataMiddleware, (req, res) => {
   // 判断文件夹是否存在
   if (fs.existsSync(`./sources/${area}`)) {
     // 如果area.log配置文件不存在，初始化area
-    if (!fs.existsSync(`./sources/${area}/area.log.json`)) init_area(area);
-    let categoryArr = JSON.parse(fs.readFileSync(`./sources/${area}/area.log.json`)).dir;
+    if (!fs.existsSync(`./sources/${area}/area.config.json`)) initArea(area);
+    let categoryArr = JSON.parse(fs.readFileSync(`./sources/${area}/area.config.json`)).dir;
     // category有文件夹
     if (categoryArr.length > 0) {
       // 遍历category数组
       categoryArr.forEach(category => {
         // 如果category.log配置文件不存在，初始化category
-        if (!fs.existsSync(`./sources/${area}/${category}/category.log.json`)) init_category(area, category);
-        let itemArr = JSON.parse(fs.readFileSync(`./sources/${area}/${category}/category.log.json`)).dir;
+        if (!fs.existsSync(`./sources/${area}/${category}/category.config.json`)) initCategory(area, category);
+        let itemArr = JSON.parse(fs.readFileSync(`./sources/${area}/${category}/category.config.json`)).dir;
         // item有文件夹
         if (itemArr.length > 0) {
           itemArr.forEach(item => {
             // 如果item.log配置文件不存在，初始化item
-            if (!fs.existsSync(`./sources/${area}/${category}/${item}/item.log.json`)) init_item(area, category, item);
+            if (!fs.existsSync(`./sources/${area}/${category}/${item}/item.config.json`)) initItem(area, category, item);
             // 获取配置信息
-            let itemObj = JSON.parse(fs.readFileSync(`./sources/${area}/${category}/${item}/item.log.json`));
+            let itemObj = JSON.parse(fs.readFileSync(`./sources/${area}/${category}/${item}/item.config.json`));
             // 生成新的配置信息并返回
             idUrl = `/sources/${area}/${category}/${itemObj.id}`;
             coverUrl = itemObj.cover ? `/sources/${area}/${category}/${item}/${itemObj.cover}` : '';
@@ -69,4 +69,4 @@ dataRouter.get('/:area/:category/play/:itemId', dataMiddleware, (req, res) => {
   res.send(req.params);
 })
 
-module.exports = dataRouter;
+module.exports.dataRouter = dataRouter;
