@@ -1,5 +1,6 @@
+# 忽略git上传的目录
 node_modules/
 dist/
 sources/
 logs/
-cache/
+cache/*.json

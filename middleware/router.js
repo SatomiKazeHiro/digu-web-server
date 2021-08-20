@@ -8,8 +8,9 @@ let baseMiddleware = function (req, res, next) {
 }
 
 let dataMiddleware = function (req, res, next) {
+  console.log(req.ip, req.url);
   if (req.params.area == 'favicon.ico') return;
-  if (areaArr.includes(req.params.area)) next();
+  if (areaArr.includes(req.query.area)) next();
   else return res.redirect("/404");
 }
 

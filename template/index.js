@@ -19,7 +19,8 @@ let itemConfig = JSON.stringify({
   cover: "",
   customCover: "",
   type: "",
-  files: []
+  files: [],
+  url: ""
 })
 
 

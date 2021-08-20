@@ -22,7 +22,7 @@ let init = () => {
   // 检测缓存映射目录
   if (!fs.existsSync("./cache")) fs.mkdirSync("./cache");
   let mapObj = {
-    IdtoUrl: {},
+    IdToUrl: {},
     TagToIds: {}
   }
 
@@ -49,6 +49,7 @@ let init = () => {
     // 当sources有内容时扫描
     if (areaArr.length > 0) {
       areaArr.forEach(area => {
+        mapObj.IdToUrl[area] = {};
         // 扫描area的子文件夹生成配置信息并返回category结果
         let categoryArr = scanFolder('./sources/', area, 'area');
         // 当category有内容时扫描
@@ -64,7 +65,7 @@ let init = () => {
                 // 跳过item部分的扫描,通常是游戏
                 if (!excludeScanItemDir.includes(area)) {
                   let resObj = scanItem(`./sources/${area}/${category}/`, item);
-                  mapObj.IdtoUrl[resObj.id] = resObj.url;
+                  mapObj.IdToUrl[area][resObj.id] = resObj.url;
                 }
               })
             }
