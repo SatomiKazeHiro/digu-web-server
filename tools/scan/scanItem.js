@@ -3,9 +3,7 @@
  */
 const fs = require('fs')
 let { ioLog } = require('../ioLog');
-let { SortLikeWin } = require('../sort');
-
-// const sortLikeWin = require('./sortLikeWin');
+let { sortAsWin } = require('../sortAsWin');
 
 // 项目初始记录路径
 let initLogPath = './logs/init ' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '.log';
@@ -25,7 +23,10 @@ let scanItem = (parentPath, folderName) => {
   // 读取目录文件信息
   let scanArr = fs.readdirSync(completePath);
   // 按windows排序
-  scanArr.sort(SortLikeWin);
+  scanArr.sort(sortAsWin);
+
+  // 查看文件状态（判断是文件还是文件夹）
+  let stat;
 
   // 返回对象id和存储路径进缓存
   let resObj = {
@@ -45,6 +46,11 @@ let scanItem = (parentPath, folderName) => {
     // 遍历files寻找cover作为封面
     if (scanArr.length > 0)
       scanArr.forEach(file => {
+        // 根据路径装载文件/目录状态信息
+        stat = fs.lstatSync(completePath + file)
+        // 当有文件夹的时候，判断类型是连载版
+        if (stat.isDirectory()) itemObj.type = "serial";
+
         if (reg.test(file)) {
           // 在遍历之时先存储第一张图片作为封面备用
           if (firstImg == '') firstImg = file;
@@ -89,6 +95,11 @@ let scanItem = (parentPath, folderName) => {
     // 寻找cover作为封面
     if (scanArr.length > 0)
       scanArr.forEach(file => {
+        // 根据路径装载文件/目录状态信息
+        stat = fs.lstatSync(completePath + file)
+        // 当有文件夹的时候，判断类型是连载版
+        if (stat.isDirectory()) itemObj.type = "serial";
+
         if (reg.test(file)) {
           // 在遍历之时先存储第一张图片作为封面备用
           if (firstImg == '') firstImg = file;
@@ -110,7 +121,7 @@ let scanItem = (parentPath, folderName) => {
     })
 
     // 按windows排序
-    // itemObj.files.sort(SortLikeWin);
+    itemObj.files.sort(sortAsWin);
 
     // 当比较数组有新的内容时提示更新
     if (addArr.length > 0 || subArr.length > 0) {

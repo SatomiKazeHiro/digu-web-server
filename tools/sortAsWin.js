@@ -1,4 +1,4 @@
-function SortLikeWin(v1, v2) {
+function sortAsWin(v1, v2) {
   var a = v1
   var b = v2
   var reg = /[0-9]+/g;
@@ -47,7 +47,7 @@ function SortLikeWin(v1, v2) {
 }
 
 // var arr = ["身份证照片31", "身份证照片3106", "身份证照3106", '身份证照片03', '10', '身份证照片2', '03'];
-// arr.sort(SortLikeWin);
-// console.log(arr.sort(SortLikeWin));
+// arr.sort(sortAsWin);
+// console.log(arr.sort(sortAsWin));
 
-module.exports.SortLikeWin = SortLikeWin;
+module.exports.sortAsWin = sortAsWin;

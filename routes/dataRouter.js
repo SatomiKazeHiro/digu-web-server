@@ -12,7 +12,7 @@ const process = require("process")
 const dataRouter = express.Router();
 
 // 资源初始化
-let { initArea, initCategory, initItem } = require("../tools/init");
+// let { initArea, initCategory, initItem } = require("../tools/init");
 
 // 路由中间件
 let { dataMiddleware } = require('../middleware/router');
@@ -66,8 +66,9 @@ dataRouter.get('/get/areaRandom', dataMiddleware, (req, res) => {
     // 读取项目的配置文件
     let readObj = JSON.parse(fs.readFileSync(areaObj[keyArr[index]] + "item.config.json"));
     // 当自定义封面存在的时候使用自定义封面，否则使用默认封面（第一张图片）
-    if (readObj.customCover) tempObj.cover = areaObj[keyArr[index]] + readObj.customCover;
-    else tempObj.cover = areaObj[keyArr[index]] + readObj.cover;
+    tempObj.cover = readObj.customCover ? readObj.customCover : readObj.cover;
+    if (tempObj.cover) tempObj.cover = areaObj[keyArr[index]] + tempObj.cover;
+
     // Web上的url和title
     tempObj.url = readObj.url;
     tempObj.title = readObj.title;
@@ -135,7 +136,8 @@ dataRouter.get('/get/areaNormal', dataMiddleware, (req, res) => {
     // 读取每个项的配置文件
     let readObj = JSON.parse(fs.readFileSync(areaObj[keyArr[i]] + 'item.config.json'));
     // 设置封面
-    cover = areaObj[keyArr[i]] + (readObj.customCover ? readObj.customCover : readObj.cover);
+    cover = (readObj.customCover ? readObj.customCover : readObj.cover);
+    if (cover) cover = areaObj[keyArr[i]] + cover;
     // 装载
     data.push({
       id: readObj.id,
@@ -189,7 +191,8 @@ dataRouter.get('/get/categoryRandom', dataMiddleware, (req, res) => {
     // 读取项配置文件
     let readObj = JSON.parse(fs.readFileSync(basePath + itemArr[index] + '/item.config.json'));
     // 设置封面
-    let cover = basePath + itemArr[index] + '/' + (readObj.customCover ? readObj.customCover : readObj.cover);
+    let cover = readObj.customCover ? readObj.customCover : readObj.cover;
+    if (cover) cover = basePath + itemArr[index] + '/' + cover;
     // 封装对象
     let itemObj = {
       id: readObj.id,
@@ -260,7 +263,8 @@ dataRouter.get('/get/categoryNormal', dataMiddleware, (req, res) => {
     // 读取每个项的配置文件
     let readObj = JSON.parse(fs.readFileSync(basePath + itemArr[i] + '/item.config.json'));
     // 设置封面
-    cover = basePath + itemArr[i] + '/' + (readObj.customCover ? readObj.customCover : readObj.cover);
+    cover = readObj.customCover ? readObj.customCover : readObj.cover;
+    if (cover) cover = basePath + itemArr[i] + '/' + cover;
     // 装载
     data.push({
       id: readObj.id,
@@ -297,8 +301,8 @@ dataRouter.get('/get/item', dataMiddleware, (req, res) => {
   // console.log(readObj);
 
   // 返回对象的封装需要进一步处理的属性
-  readObj.cover = basePath + readObj.cover;
-  readObj.customCover = readObj.customCover ? (basePath + readObj.customCover) : "";
+  readObj.cover = readObj.cover ? basePath + readObj.cover : readObj.cover;
+  readObj.customCover = readObj.customCover ? (basePath + readObj.customCover) : readObj.customCover;
   let spliceIndex = readObj.files.indexOf('item.config.json');
   if (spliceIndex > -1) {
     readObj.files.splice(spliceIndex, 1);
