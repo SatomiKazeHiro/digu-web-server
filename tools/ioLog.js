@@ -11,9 +11,9 @@ const { appendFileSync } = require('fs');
  * @param {String} msg 需要输出的信息
  * @param {String} type 输出信息类型
  */
-let ioLog = (path, msg, type) => {
-  // 生成时间
-  let time = new Date();
+module.exports = ioLog = (path, msg, type) => {
+  // 生成当前时间
+  let time = new Date().toLocaleString();
   // 开头格式字符串
   let startStr = '     - ';
   // 保存内容模板[INFO]
@@ -45,5 +45,3 @@ let ioLog = (path, msg, type) => {
     appendFileSync(path, '[INFO][' + time + '] 服务器启动成功，端口为' + msg + EOL, 'utf8');
   }
 }
-
-module.exports.ioLog = ioLog;

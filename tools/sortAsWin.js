@@ -1,4 +1,10 @@
-function sortAsWin(v1, v2) {
+/**
+ * 仿Win10文件排序
+ * @param {*} v1
+ * @param {*} v2
+ * @returns
+ */
+ module.exports = function sortAsWin(v1, v2) {
   var a = v1
   var b = v2
   var reg = /[0-9]+/g;
@@ -49,5 +55,3 @@ function sortAsWin(v1, v2) {
 // var arr = ["身份证照片31", "身份证照片3106", "身份证照3106", '身份证照片03', '10', '身份证照片2', '03'];
 // arr.sort(sortAsWin);
 // console.log(arr.sort(sortAsWin));
-
-module.exports.sortAsWin = sortAsWin;

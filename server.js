@@ -13,18 +13,18 @@ console.log('\033[44;30m INFO \033[40;34m 服务器启动中... \033[0m');
 const server = new express();
 
 // 配置模块参数
-const { port, initLogPath, startLogPath } = require("./config");
+const { port, startLogPath } = require("./config");
 
-// 自定义模块方法
-let { ioLog } = require('./tools/ioLog');
-let { init, initSources } = require("./tools/init");
-// 初始化
-init();
-
-// 自定义路由
+// 引用自定义路由
 let { baseRouter } = require('./routes/baseRouter');
 let { dataRouter } = require('./routes/dataRouter');
 let { webRouter } = require('./routes/webRouter');
+
+// 自定义模块方法
+let ioLog = require('./tools/ioLog');
+let init = require("./tools/init");
+// 初始化
+init()
 
 // 静态资源设置
 server.use('/sources', express.static(path.join(__dirname + '/sources')));
@@ -50,3 +50,4 @@ server.listen(port, () => {
   console.log('/server => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
 })
+

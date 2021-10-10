@@ -1,6 +1,7 @@
 const fs = require('fs');
+let SqlTool = require('../tools/SqlTool');
 
-let areaArr = JSON.parse(fs.readFileSync('./sources/sources.config.json')).dir;
+let areaArr = SqlTool.getAreas();
 
 let baseMiddleware = function (req, res, next) {
   if (req.params.area == 'favicon.ico') return;
