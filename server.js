@@ -43,6 +43,7 @@ server.get('*', (req, res) => {
 
 server.listen(port, () => {
   ioLog(startLogPath, port, 'DONE')
+
   var mem = process.memoryUsage();
   var format = function (bytes) {
     return (bytes / 1024 / 1024).toFixed(2) + 'MB';

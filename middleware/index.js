@@ -1,4 +1,3 @@
-const fs = require('fs');
 let SqlTool = require('../tools/SqlTool');
 
 let areaArr = SqlTool.getAreas();

@@ -12,7 +12,7 @@ let initLogPath = require('../config').initLogPath;
  * 扫描包含内容项目的方法，不同于只有扫描文件夹的方法
  * @param {String} parentPath 父目录路径
  * @param {String} folderName 文件夹名称
- * @param {Boolean} isSerialize 项目的连载形式
+ * @param {Boolean} isSerialize 项目是否是连载类型
  * @returns {Object} 对象的id和资源路径
  */
 let scanItem = (parentPath, folderName, isSerialize = false) => {
@@ -102,12 +102,13 @@ let scanItem = (parentPath, folderName, isSerialize = false) => {
         }
       })
     // 如果没有cover作为封面,则默认第一张图片为封面,若没有图片,firstImg为空
-    if (itemObj.cover == '') itemObj.cover = firstImg;
+    if (itemObj.cover === '') itemObj.cover = firstImg;
 
     // 比较数组存储新添加内容
     let addArr = scanArr.filter(item => {
       return !itemObj.files.map(v => v).includes(item)
     })
+
     // 比较数组存储被移除内容
     let subArr = itemObj.files.filter(item => {
       return !scanArr.map(v => v).includes(item)

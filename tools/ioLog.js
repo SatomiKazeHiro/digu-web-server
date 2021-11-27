@@ -41,7 +41,7 @@ module.exports = ioLog = (path, msg, type) => {
     appendFileSync(path, logINFO, 'utf8');
   } else if (type.toLowerCase() == 'done') {
     // 输出服务器启动的信息
-    console.log('\033[42;30m DONE \033[40;32m 服务器启动成功 http://www.localhost:' + msg + '\033[0m');
+    console.log('\033[42;30m DONE \033[40;32m 服务器启动成功 http://localhost:' + msg + '\033[0m');
     appendFileSync(path, '[INFO][' + time + '] 服务器启动成功，端口为' + msg + EOL, 'utf8');
   }
 }

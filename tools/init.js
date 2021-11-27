@@ -40,14 +40,14 @@ module.exports = init = () => {
     // sources文件夹存在
     // 检测source子文件夹的内容
     let areaArr = scanFolder('./', 'sources', 'sources');
-    areaArr.forEach((area) => {
-      // 判断数据库是否有该area，有则设置init为1，没有则插入新数据
+    areaArr.forEach(area => {
+      // 判断数据库是否有该域（area），有则设置init为1，没有则插入新数据
       if (SqlTool.findArea(area)) SqlTool.setInitTrue(area);
       else if (SqlTool.insert('areas_index', { area, web_name: "", log_template: "", state: "", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + area, 'increase');
       let categoryArr = scanFolder(`./sources/`, area, 'area');
       if (categoryArr.length > 0) {
         categoryArr.forEach(category => {
-          // 判断数据库在area的前提下是否有某一category，有则设置init为1，没有则插入新数据
+          // 判断数据库在某域的前提下是否有某一分类（category），有则设置init为1，没有则插入新数据
           if (SqlTool.findCategory(area, category)) SqlTool.setInitTrue(area, category);
           else if (SqlTool.insert('categories_index', { area, category, web_name: "", log_template: "", state: "", item_log_template: "", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + category, 'increase');
           let itemArr = scanFolder(`./sources/${area}/`, category, 'category');
@@ -55,27 +55,27 @@ module.exports = init = () => {
             itemArr.forEach(item => {
               let itemObj = scanItem(`./sources/${area}/${category}/`, item);
 
-              // 判断数据库中是否有该资源，有则设置其init为1，没有则插入新数据
-              if (SqlTool.findItem(itemObj.id)) SqlTool.setInitTrue(null, null, itemObj.id);
-              else {
-                // item索引
-                if (SqlTool.insert('items_index', { id: itemObj.id, area, category, item: itemObj.title, init: 1 })) {
+              // 判断数据库中是否有该资源（item），有则先设置其init为1，没有则插入新数据
+              if (SqlTool.findItem(itemObj.id)) {
+                SqlTool.setInitTrue(null, null, itemObj.id);
+                // 更新数据
+                if (itemObj.up) {
+                  SqlTool.update('item_msg', { id: itemObj.id, cover: itemObj.cover, title: itemObj.title, intro: itemObj.intro, custom_cover: itemObj.custom_cover, type: itemObj.type })
+                  ioLog(initLogPath, `[+] /sources/${area}/${category}/${item} -> UP`, 'up');
+                }
+              } else {
+                // 插入数据到资源信息表和索引表
+                if (SqlTool.insert('items_index', { id: itemObj.id, area, category, item: itemObj.title, init: 1 }) && SqlTool.insert('item_msg', { id: itemObj.id, cover: itemObj.cover, title: itemObj.title, intro: itemObj.intro, custom_cover: itemObj.custom_cover, type: itemObj.type })) {
+                  // tag索引
+                  if (itemObj.tags.length > 0)
+                    itemObj.tags.forEach(tag => {
+                      SqlTool.insert('tags_index', { tag, id: itemObj.id })
+                    })
+                  // 输出更新信息
                   ioLog(initLogPath, `[+] /sources/${area}/${category} -> ${item}`, 'increase');
                   // 如果是搬迁过来的资源，其带有item.config.json的，在写入数据库之后也需要up输出
                   ioLog(initLogPath, `[+] /sources/${area}/${category}/${item} -> UP`, 'up');
-                  // 避免二次up输出
-                  itemObj.up = false;
                 }
-                // item信息
-                SqlTool.insert('item_msg', { id: itemObj.id, cover: itemObj.cover, title: itemObj.title, intro: itemObj.intro, custom_cover: itemObj.custom_cover, type: itemObj.type })
-                // tag索引
-                if (itemObj.tags.length > 0)
-                  itemObj.tags.forEach(i => {
-                    SqlTool.insert('tags_index', { tag: i, id: itemObj.id })
-                  })
-              }
-              if (itemObj.up) {
-                ioLog(initLogPath, `[+] /sources/${area}/${category}/${item} -> UP`, 'up');
               }
             })
           }

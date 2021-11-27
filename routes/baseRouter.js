@@ -5,7 +5,7 @@ const express = require("express");
 const baseRouter = express.Router();
 
 // 中间件
-let { baseMiddleware } = require('../middleware/router');
+let { baseMiddleware } = require('../middleware');
 
 
 baseRouter.get('/', baseMiddleware, (req, res) => {

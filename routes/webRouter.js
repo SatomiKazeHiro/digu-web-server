@@ -5,7 +5,7 @@ const express = require("express");
 const webRouter = express.Router();
 
 // 中间件
-let { webMiddleware } = require('../middleware/router');
+let { webMiddleware } = require('../middleware');
 
 
 webRouter.get('/:area', webMiddleware, (req, res) => {

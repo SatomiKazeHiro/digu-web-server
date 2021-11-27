@@ -24,11 +24,19 @@ module.exports = class SqlTool {
     return resArr;
   }
 
+  static getCategoryListbyArea(area) {
+    const readCategories = db.prepare('select category from categories_index where area = ?');
+    let resArr = readCategories.all(area).map(i => {
+      return { category: i.category, 'web_name': i.web_name || '' };
+    });
+    return resArr;
+  }
+
   /**
    * 获取所有的资源目录id
    * @returns 资源目录的id数组
    */
-  static getItems() {
+  static getItemId() {
     const readItems = db.prepare('select id from items_index');
     let resArr = readItems.all().map(i => i.id);
     return resArr;
@@ -39,7 +47,7 @@ module.exports = class SqlTool {
    * @param {String } area 域名
    * @returns 返回某个域的所有资源信息
    */
-  static getItemsByArea(area) {
+  static getItemIdByArea(area) {
     const readItems = db.prepare('select * from items_index where area = ?');
     let resIdArr = readItems.all(area).map(i => i.id);
     return resIdArr;
@@ -51,7 +59,7 @@ module.exports = class SqlTool {
    * @param {String } category 项目名
    * @returns 返回某个域和分类的所有资源信息
    */
-  static getItemsByAC(area, category) {
+  static getItemIdByAC(area, category) {
     const readItems = db.prepare('select * from items_index where area = ? and category = ?');
     let resObjArr = readItems.all(area, category).map(i => i.id);
     return resObjArr;
@@ -72,12 +80,12 @@ module.exports = class SqlTool {
    * 生成资源专属路由
    * @param {Number} id 资源目录
    */
-  static getItemUrl(id, neetItem = false) {
+  static getItemUrl(id, neetItemPath = false) {
     const readItemIndex = db.prepare('select * from items_index where id = ?')
     let readObj = readItemIndex.get(id);
-    if (!neetItem)
-      return `./sources/${readObj.area}/${readObj.category}/`
-    else return `./sources/${readObj.area}/${readObj.category}/${readObj.item}/`
+    if (!neetItemPath)
+      return `/sources/${readObj.area}/${readObj.category}/`
+    else return `/sources/${readObj.area}/${readObj.category}/${readObj.item}/`
   }
 
   /**
@@ -150,6 +158,36 @@ module.exports = class SqlTool {
 
     const insert = db.prepare(sql);
     insert.run(params);
+    return true;
+  }
+
+  static update(table, params) {
+    let sql;
+    switch (table) {
+      case 'areas_index':
+        // sql = `UPDATE ${table} SET area = @area, web_name = @web_name, log_template = @log_template, state = @state, init = @init`
+        break;
+      case 'categories_index':
+        // sql = `UPDATE ${table} SET area = @area, category = @category, web_name = @web_name, log_template = @log_template, state = @state, item_log_template = @item_log_template, init = @init`
+        break;
+      case 'items_index':
+        sql = `UPDATE ${table} SET area = @area, category = @category, item = @item, init = @init WHERE id = @id`
+        break;
+      case 'item_msg':
+        sql = `UPDATE ${table} SET cover = @cover, title = @title, intro = @intro, custom_cover = @custom_cover, type = @type WHERE id = @id`
+        break;
+      case 'tags_index':
+        // sql = `UPDATE ${table} SET tag = @tag, id = @id`
+        break;
+      default:
+        sql = '';
+        break;
+    }
+    // 表名错误的时候返回false
+    if (!sql) return false;
+
+    const update = db.prepare(sql);
+    update.run(params);
     return true;
   }
 
@@ -234,7 +272,6 @@ module.exports = class SqlTool {
    * @param {Function} ioLog 外部传入的作为参数的输出函数
    * @returns 执行成功返回true，执行失败返回false
    */
-
   static deleteInitFalseI(ioLog) {
     // 获取所有init为0的资源id
     const readItems = db.prepare('select * from items_index where init = 0');
