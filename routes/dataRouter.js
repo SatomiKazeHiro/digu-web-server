@@ -22,28 +22,28 @@ dataRouter.get('/get/areaAllName', (req, res) => {
   var format = function (bytes) {
     return (bytes / 1024 / 1024).toFixed(2) + 'MB';
   };
-  console.log('/get/areaName => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  console.log('/get/areaAllName => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
   let resArr = SqlTool.getAreas()
   res.send({ code: 200, data: resArr })
 })
 
-// 获取某个域下的所有类的名字
-dataRouter.get('/get/categoryListbyArea', dataMiddleware, (req, res) => {
+// 获取指定域下的所有类的名字
+dataRouter.get('/get/getCategories', (req, res) => {
   var mem = process.memoryUsage();
   var format = function (bytes) {
     return (bytes / 1024 / 1024).toFixed(2) + 'MB';
   };
-  console.log('/get/categoryListbyArea => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  console.log('/get/getCategories => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
   if (req.query.area) {
-    let resArr = SqlTool.getCategoryListbyArea(req.query.area);
+    let resArr = SqlTool.getCategories(req.query.area, false);
     res.send({ code: 200, data: resArr });
   } else res.send({ code: 400, msg: "area错误" });
 
 })
 
-// 首页获取随机内容
+// 获取随机资源项目内容（用于首页比较多）
 dataRouter.get('/get/itemRandom', (req, res) => {
 
   var mem = process.memoryUsage();
@@ -87,8 +87,8 @@ dataRouter.get('/get/itemRandom', (req, res) => {
   res.send({ code: 200, data: resArr })
 })
 
-// 获取某个域下随机的内容
-dataRouter.get('/get/areaRandom', dataMiddleware, (req, res) => {
+// 获取指定域的随机内容
+dataRouter.get('/get/areaRandom', (req, res) => {
 
   var mem = process.memoryUsage();
   var format = function (bytes) {
@@ -122,7 +122,7 @@ dataRouter.get('/get/areaRandom', dataMiddleware, (req, res) => {
       continue;
     }
     // 判断是否右要排除在外的资源项目（场景：避免某资源项目下的随机项目和本身相同）
-    if(req.query.excludeID && itemIds[index] == req.query.excludeID){
+    if (req.query.excludeID && itemIds[index] == req.query.excludeID) {
       continue;
     }
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
@@ -138,8 +138,8 @@ dataRouter.get('/get/areaRandom', dataMiddleware, (req, res) => {
   res.send({ code: 200, data: resArr })
 })
 
-// 获取某个域的所有内容
-dataRouter.get('/get/areaNormal', dataMiddleware, (req, res) => {
+// 获取指定域的所有内容
+dataRouter.get('/get/areaNormal', (req, res) => {
 
   var mem = process.memoryUsage();
   var format = function (bytes) {
@@ -164,7 +164,7 @@ dataRouter.get('/get/areaNormal', dataMiddleware, (req, res) => {
     return;
   }
 
-  // 获取该域下所有资源目录id的内容
+  // 获取指定域下所有资源目录id的内容
   let iIdArr = SqlTool.getItemIdByArea(area);
 
   // 通过所有资源目录id的total总数和limit限制计算总页数pageTotal
@@ -195,7 +195,7 @@ dataRouter.get('/get/areaNormal', dataMiddleware, (req, res) => {
   res.send({ code: 200, data: { resArr, page, total } })
 })
 
-// 获取指定域下分类的随机内容
+// 获取指定域下分类中的随机内容
 dataRouter.get('/get/categoryRandom', (req, res) => {
 
   var mem = process.memoryUsage();
@@ -248,7 +248,7 @@ dataRouter.get('/get/categoryRandom', (req, res) => {
   res.send({ code: 200, data: resArr })
 })
 
-// 获取指定域下分类的所有内容
+// 获取指定域下分类中的所有内容
 dataRouter.get('/get/categoryNormal', (req, res) => {
 
   var mem = process.memoryUsage();
@@ -308,7 +308,7 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
 
 })
 
-// 获取项目内容
+// 获取指定 id 资源项目内容
 dataRouter.get('/get/item', (req, res) => {
 
   var mem = process.memoryUsage();
@@ -342,7 +342,7 @@ dataRouter.get('/get/item', (req, res) => {
   res.send({ code: 200, data: readObj })
 })
 
-// 检查是否有指定域
+// 检测是否有指定域
 dataRouter.get('/check/area', (req, res) => {
 
   var mem = process.memoryUsage();
@@ -355,7 +355,7 @@ dataRouter.get('/check/area', (req, res) => {
   res.send({ code: 200, data: resBoolean });
 })
 
-// 检查是否有指定类
+// 检测是否有指定类
 dataRouter.get('/check/category', (req, res) => {
 
   var mem = process.memoryUsage();
@@ -368,7 +368,7 @@ dataRouter.get('/check/category', (req, res) => {
   res.send({ code: 200, data: resBoolean });
 })
 
-// // 检查是否有指定资源项目
+// // 检测是否有指定资源项目
 // dataRouter.get('/check/item', (req, res) => {
 
 //   var mem = process.memoryUsage();
@@ -378,5 +378,114 @@ dataRouter.get('/check/category', (req, res) => {
 //   console.log('/check/item => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
 // })
+
+// 生成目录树
+dataRouter.get('/get/logtree', (req, res) => {
+
+  var mem = process.memoryUsage();
+  var format = function (bytes) {
+    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+  };
+  console.log('/get/logtree => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+
+  let resArr = [];
+  SqlTool.getAreas(false).forEach(i => {
+    i.children = [];
+    i.label = i.area;
+    delete i.area;
+    let tempCs = SqlTool.getCategories(i.label, false);
+    tempCs.forEach(c => {
+      c.label = c.category;
+      delete c.category;
+      i.children.push(c)
+    })
+    resArr.push(i);
+  })
+  res.send({ code: 200, data: resArr })
+})
+
+// 获取 area 的配置信息
+dataRouter.get('/get/aeraIndex', (req, res) => {
+
+  var mem = process.memoryUsage();
+  var format = function (bytes) {
+    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+  };
+  console.log('/get/aeraIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+
+  if (req.query.area) {
+    let resObj = SqlTool.getAreaMsg(req.query.area);
+    res.send({ code: 200, data: resObj })
+  } else res.send({ code: 400, msg: "area为空" })
+})
+
+// 获取 category 的配置信息
+dataRouter.get('/get/categoryIndex', (req, res) => {
+
+  var mem = process.memoryUsage();
+  var format = function (bytes) {
+    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+  };
+  console.log('/get/categoryIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+
+  if (!req.query.area) res.send({ code: 400, msg: "area为空" });
+  else if (!req.query.category) res.send({ code: 400, msg: "category为空" });
+  else {
+    let resObj = SqlTool.getCategoryMsg(req.query.area, req.query.category);
+    res.send({ code: 200, data: resObj });
+  }
+})
+
+// 设置 area
+dataRouter.get('/set/areaIndex', (req, res) => {
+
+  var mem = process.memoryUsage();
+  var format = function (bytes) {
+    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+  };
+  console.log('/set/areaIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+
+  if (req.query.areaObj) {
+    if (SqlTool.update('areas_index', JSON.parse(req.query.areaObj))) {
+      res.send({ code: 200 });
+    }
+    else res.send({ code: 400, msg: "数据库操作出现错误" })
+  } else res.send({ code: 400, msg: "参数错误" })
+})
+
+// 设置 category
+dataRouter.get('/set/categoryIndex', (req, res) => {
+
+  var mem = process.memoryUsage();
+  var format = function (bytes) {
+    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+  };
+  console.log('/set/categoryIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+
+  if (req.query.categoryObj) {
+    if (SqlTool.update('categories_index', JSON.parse(req.query.categoryObj))) {
+      res.send({ code: 200 });
+    }
+    else res.send({ code: 400, msg: "数据库操作出现错误" })
+  } else res.send({ code: 400, msg: "参数错误" })
+})
+
+// // 设置 category
+// dataRouter.get('/get/', (req, res) => {
+
+//   var mem = process.memoryUsage();
+//   var format = function (bytes) {
+//     return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+//   };
+//   console.log('/get/categoryIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+
+//   if (req.query.categoryObj) {
+//     if (SqlTool.update('categories_index', JSON.parse(req.query.categoryObj))) {
+//       res.send({ code: 200 });
+//     }
+//     else res.send({ code: 400, msg: "数据库操作出现错误" })
+//   } else res.send({ code: 400, msg: "参数错误" })
+// })
+
 
 module.exports.dataRouter = dataRouter;

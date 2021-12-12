@@ -2,24 +2,11 @@
   "serverPort": 2233,
   "baseArea": [
     "anime",
-    "manga",
-
-    "movie",
-
-    "video",
-    "music",
-    "illustration",
-    "ebook",
-    "allum"
+    "manga"
   ],
   "doubleDeckFolder": [
-    "video",
-    "music",
-    "illustration",
-    "ebook",
-    "allum"
+
   ],
   "gameFolder": [
-    "game"
   ]
 }

@@ -15,21 +15,39 @@ sqls.forEach(sql => db.prepare(sql).run());
 module.exports = class SqlTool {
 
   /**
-   * 获取数据库中的所有“域”
-   * @returns Array 域集合的数组
+   * 获取数据库中的所有“域”名
+   * @param {Boolean} onlyArea 是否只返回域名，否则返回域名及其页面的域名
+   * @returns 域对象的数组
    */
-  static getAreas() {
-    const readAreas = db.prepare('select area from areas_index');
-    let resArr = readAreas.all().map(i => i.area);
-    return resArr;
+  static getAreas(onlyArea = true) {
+    const readAreas = db.prepare('select area, web_name from areas_index');
+    if (onlyArea) {
+      let resArr = readAreas.all().map(i => i.area);
+      return resArr;
+    } else {
+      let resArr = readAreas.all().map(i => {
+        return { area: i.area, 'web_name': i.web_name || '' }
+      });
+      return resArr;
+    }
   }
 
-  static getCategoryListbyArea(area) {
-    const readCategories = db.prepare('select category from categories_index where area = ?');
-    let resArr = readCategories.all(area).map(i => {
-      return { category: i.category, 'web_name': i.web_name || '' };
-    });
-    return resArr;
+  /**
+   * 获取指定域下的所有类
+   * @param {String} area 域
+   * @returns 类对象数组
+   */
+  static getCategories(area, onlyCategory = true) {
+    const readCategories = db.prepare('select category, web_name from categories_index where area = ?');
+    if (onlyCategory) {
+      let resArr = readCategories.all(area).map(i => i.category);
+      return resArr;
+    } else {
+      let resArr = readCategories.all(area).map(i => {
+        return { category: i.category, 'web_name': i.web_name || '' };
+      });
+      return resArr;
+    }
   }
 
   /**
@@ -43,9 +61,9 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 获取某个域下的所有资源信息
+   * 获取指定域下的所有资源id
    * @param {String } area 域名
-   * @returns 返回某个域的所有资源信息
+   * @returns 返回资源id数组
    */
   static getItemIdByArea(area) {
     const readItems = db.prepare('select * from items_index where area = ?');
@@ -54,31 +72,55 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 获取某个域下的所有资源信息
+   * 获取指定类下所有资源id
    * @param {String } area 域名
    * @param {String } category 项目名
-   * @returns 返回某个域和分类的所有资源信息
+   * @returns 返回资源id数组
    */
   static getItemIdByAC(area, category) {
     const readItems = db.prepare('select * from items_index where area = ? and category = ?');
-    let resObjArr = readItems.all(area, category).map(i => i.id);
-    return resObjArr;
+    let readIds = readItems.all(area, category).map(i => i.id);
+    return readIds;
   }
 
   /**
-   * 用于获取某个资源项目的的信息
-   * @param {Number} id 资源目录id
-   * @returns 返回资源目录的信息对象
+   * 获取指定资源 id 的信息
+   * @param {Number} id 资源项目id
+   * @returns 返回对应的资源项目的信息对象
    */
   static getItemMsg(id) {
     const readItemMsg = db.prepare('select * from item_msg where id = ?');
-    let resObj = readItemMsg.get(id);
-    return resObj;
+    let itemObj = readItemMsg.get(id);
+    return itemObj;
   }
 
   /**
-   * 生成资源专属路由
+   * 获取指定域的信息
+   * @param {String} area 域名
+   * @returns 域对象的信息
+   */
+  static getAreaMsg(area) {
+    const readAreaMsg = db.prepare('select * from areas_index where area = ?');
+    let areaObj = readAreaMsg.get(area);
+    return areaObj;
+  }
+
+  /**
+   * 获取指定类的信息
+   * @param {String} area 域名
+   * @param {String} category 类名
+   * @returns 类对象的信息
+   */
+  static getCategoryMsg(area, category) {
+    const readCategoryMsg = db.prepare('select * from categories_index where area = ? and category = ?');
+    let categoryObj = readCategoryMsg.get(area, category);
+    return categoryObj;
+  }
+
+  /**
+   * 生成网络资源项目路由
    * @param {Number} id 资源目录
+   * @returns 字符串路径
    */
   static getItemUrl(id, neetItemPath = false) {
     const readItemIndex = db.prepare('select * from items_index where id = ?')
@@ -89,9 +131,9 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 判断数据库是否在某个“域”
+   * 检测指定域是否存在
    * @param {String} area 域名
-   * @returns 存在则返回true，否则返回false
+   * @returns 存在返回true，否则返回false
    */
   static findArea(area) {
     const readArea = db.prepare('select * from areas_index where area = ?');
@@ -101,9 +143,9 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 判断数据库是否在“域”的前提下存在某个“分类”
+   * 检测域中是否存在指定类
    * @param {String} area 域名
-   * @param {String} category 分类名
+   * @param {String} category 类名
    * @returns 存在则返回true，否则返回false
    */
   static findCategory(area, category) {
@@ -114,7 +156,7 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 判断数据库是否有该资源目录数据
+   * 检测是否存在指定资源项目
    * @param {Number} id 资源目录id
    * @returns
    */
@@ -161,14 +203,20 @@ module.exports = class SqlTool {
     return true;
   }
 
+  /**
+   * 通用的跟新数据库的方法
+   * @param {String} table 表名
+   * @param {Array | Object} params 参数对象
+   * @returns 更新成功返回 true，否则返回 false
+   */
   static update(table, params) {
     let sql;
     switch (table) {
       case 'areas_index':
-        // sql = `UPDATE ${table} SET area = @area, web_name = @web_name, log_template = @log_template, state = @state, init = @init`
+        sql = `UPDATE ${table} SET web_name = @web_name, log_template = @log_template, state = @state, init = @init WHERE area = @area`
         break;
       case 'categories_index':
-        // sql = `UPDATE ${table} SET area = @area, category = @category, web_name = @web_name, log_template = @log_template, state = @state, item_log_template = @item_log_template, init = @init`
+        sql = `UPDATE ${table} SET web_name = @web_name, log_template = @log_template, state = @state, item_log_template = @item_log_template, init = @init WHERE area = @area AND category = @category`
         break;
       case 'items_index':
         sql = `UPDATE ${table} SET area = @area, category = @category, item = @item, init = @init WHERE id = @id`
@@ -192,7 +240,7 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 用于重置所有表的init字段为0，检测到资源的时候设置为1，当服务器初始化完成后，还是0的数据将清除
+   * 用于重置所有表的 init 字段为 0，检测到资源的时候设置为 1，当服务器初始化完成后，还是 0 的数据将清除
    */
   static setInitFalse() {
     const setArea = db.prepare(`update areas_index set init = 0`)
@@ -204,9 +252,9 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 用于设置初始init，目录存在则设置1，当服务器初始化完成后，还是0的数据将清除
+   * 用于设置初始 init，目录存在则设置1，当服务器初始化完成后，还是0的数据将清除
    * @param {String} area 域名
-   * @param {String} category 分类名
+   * @param {String} category 类名
    * @param {Number} id 资源目录id
    */
   static setInitTrue(area, category, id) {
@@ -246,7 +294,7 @@ module.exports = class SqlTool {
         }
       } catch (e) {
         console.log(e);
-        return;
+        return false;
       }
     }
     if (IFCs.length > 0) {
@@ -261,7 +309,7 @@ module.exports = class SqlTool {
         }
       } catch (e) {
         console.log(e);
-        return;
+        return false;
       }
     }
     return true;

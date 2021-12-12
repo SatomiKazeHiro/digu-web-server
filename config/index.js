@@ -1,6 +1,31 @@
 const fs = require("fs");
 const config = JSON.parse(fs.readFileSync("./config/index.json"));
 // console.log(config);
+// {
+//   "serverPort": 2233,
+//   "baseArea": [
+//     "anime",
+//     "manga",
+
+//     "movie",
+
+//     "video",
+//     "music",
+//     "illustration",
+//     "ebook",
+//     "allum"
+//   ],
+//   "doubleDeckFolder": [
+//     "video",
+//     "music",
+//     "illustration",
+//     "ebook",
+//     "allum"
+//   ],
+//   "gameFolder": [
+//     "game"
+//   ]
+// }
 
 // 服务器启动端口号
 const port = config.serverPort;

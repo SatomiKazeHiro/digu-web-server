@@ -29,11 +29,13 @@ module.exports = init = () => {
     fs.mkdirSync("./sources");
     ioLog(initLogPath, '[+] / -> sources', 'increase');
 
+
+
     // 根据配置文件创建默认子文件夹
     baseArea.forEach((area) => {
       fs.mkdirSync('./sources/' + area, { recursive: true });
       if (SqlTool.findArea(area)) SqlTool.setInitTrue(area);
-      else if (SqlTool.insert('areas_index', { area, web_name: "", log_template: "", state: "", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + area, 'increase');
+      else if (SqlTool.insert('areas_index', { area, web_name: area, log_template: "normal", state: "hide", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + area, 'increase');
     });
 
   } else {
@@ -43,13 +45,13 @@ module.exports = init = () => {
     areaArr.forEach(area => {
       // 判断数据库是否有该域（area），有则设置init为1，没有则插入新数据
       if (SqlTool.findArea(area)) SqlTool.setInitTrue(area);
-      else if (SqlTool.insert('areas_index', { area, web_name: "", log_template: "", state: "", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + area, 'increase');
+      else if (SqlTool.insert('areas_index', { area, web_name: area, log_template: "normal", state: "hide", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + area, 'increase');
       let categoryArr = scanFolder(`./sources/`, area, 'area');
       if (categoryArr.length > 0) {
         categoryArr.forEach(category => {
           // 判断数据库在某域的前提下是否有某一分类（category），有则设置init为1，没有则插入新数据
           if (SqlTool.findCategory(area, category)) SqlTool.setInitTrue(area, category);
-          else if (SqlTool.insert('categories_index', { area, category, web_name: "", log_template: "", state: "", item_log_template: "", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + category, 'increase');
+          else if (SqlTool.insert('categories_index', { area, category, web_name: category, log_template: "normal", state: "hide", item_log_template: "", init: 1 })) ioLog(initLogPath, '[+] /sources -> ' + category, 'increase');
           let itemArr = scanFolder(`./sources/${area}/`, category, 'category');
           if (itemArr.length > 0) {
             itemArr.forEach(item => {
@@ -67,10 +69,10 @@ module.exports = init = () => {
                 // 插入数据到资源信息表和索引表
                 if (SqlTool.insert('items_index', { id: itemObj.id, area, category, item: itemObj.title, init: 1 }) && SqlTool.insert('item_msg', { id: itemObj.id, cover: itemObj.cover, title: itemObj.title, intro: itemObj.intro, custom_cover: itemObj.custom_cover, type: itemObj.type })) {
                   // tag索引
-                  if (itemObj.tags.length > 0)
-                    itemObj.tags.forEach(tag => {
-                      SqlTool.insert('tags_index', { tag, id: itemObj.id })
-                    })
+                  // if (itemObj.tags.length > 0)
+                  //   itemObj.tags.forEach(tag => {
+                  //     SqlTool.insert('tags_index', { tag, id: itemObj.id })
+                  //   })
                   // 输出更新信息
                   ioLog(initLogPath, `[+] /sources/${area}/${category} -> ${item}`, 'increase');
                   // 如果是搬迁过来的资源，其带有item.config.json的，在写入数据库之后也需要up输出

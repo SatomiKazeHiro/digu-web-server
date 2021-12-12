@@ -64,8 +64,9 @@ let scanItem = (parentPath, folderName, isSerialize = false) => {
     itemObj.tags = [];
     itemObj.custom_cover = "";
 
-    // 加载文件信息
+    // 加载目录中的文件信息
     itemObj.files.push(...scanArr);
+    // 写入文件至当前目录中
     fs.writeFileSync(completePath + 'item.config.json', JSON.stringify(itemObj));
 
   } else {
