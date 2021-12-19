@@ -148,7 +148,7 @@ dataRouter.get('/get/areaNormal', (req, res) => {
   console.log('/get/areaNormal => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
   // 获取请求参数
-  let { area, limit, page } = req.query;
+  let { area, limit, page, msgType } = req.query;
   // console.log(area, limit, page);
 
   // 字符串数据处理
@@ -181,15 +181,28 @@ dataRouter.get('/get/areaNormal', (req, res) => {
   let pageStart = limit * (page - 1);
   let pageEnd = total - limit * (page - 1) <= limit ? total : limit * page;
 
+  let readObj, url;
   for (let i = pageStart; i < pageEnd; i++) {
-    let readObj = SqlTool.getItemMsg(iIdArr[i]);
-    let url = SqlTool.getItemUrl(readObj.id);
-    resArr.push({
-      id: readObj.id,
-      cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
-      title: readObj.title,
-      url
-    });
+    readObj = SqlTool.getItemMsg(iIdArr[i]);
+    url = SqlTool.getItemUrl(readObj.id);
+    if (msgType === "all")
+      resArr.push({
+        id: readObj.id,
+        cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
+        title: readObj.title,
+        url,
+        intro: readObj.intro,
+        type: readObj.type,
+      });
+    else
+      resArr.push({
+        id: readObj.id,
+        cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
+        title: readObj.title,
+        url
+      });
+    readObj = null;
+    url = ""
   }
 
   res.send({ code: 200, data: { resArr, page, total } })
@@ -258,7 +271,7 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
   console.log('/get/categoryNormal => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
   // 获取请求参数
-  let { area, category, limit, page } = req.query;
+  let { area, category, limit, page, msgType } = req.query;
 
   // 字符串数据处理
   limit = parseInt(limit);
@@ -293,15 +306,28 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
   let pageStart = limit * (page - 1);
   let pageEnd = total - limit * (page - 1) <= limit ? total : limit * page;
 
+  let readObj, url;
   for (let i = pageStart; i < pageEnd; i++) {
-    let readObj = SqlTool.getItemMsg(iIdArr[i]);
-    let url = SqlTool.getItemUrl(readObj.id);
-    resArr.push({
-      id: readObj.id,
-      cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
-      title: readObj.title,
-      url
-    });
+    readObj = SqlTool.getItemMsg(iIdArr[i]);
+    url = SqlTool.getItemUrl(readObj.id);
+    if (msgType === "all")
+      resArr.push({
+        id: readObj.id,
+        cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
+        title: readObj.title,
+        url,
+        intro: readObj.intro,
+        type: readObj.type,
+      });
+    else
+      resArr.push({
+        id: readObj.id,
+        cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
+        title: readObj.title,
+        url
+      });
+    readObj = null;
+    url = "";
   }
 
   res.send({ code: 200, data: { resArr, page, total } })
