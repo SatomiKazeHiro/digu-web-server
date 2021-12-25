@@ -131,7 +131,7 @@ dataRouter.get('/get/areaRandom', (req, res) => {
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
-      url
+      url,
     });
     if (resArr.length == limit) break;
   }
@@ -153,8 +153,8 @@ dataRouter.get('/get/areaNormal', (req, res) => {
 
   // 字符串数据处理
   limit = parseInt(limit);
-  page = parseInt(page)
-  // 检测limit和page的合理性
+  page = parseInt(page);
+  // 检测 limit 和 page 的合理性
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
     res.send({ code: 400, msg: "limit错误" });
     return;
@@ -202,7 +202,7 @@ dataRouter.get('/get/areaNormal', (req, res) => {
         url
       });
     readObj = null;
-    url = ""
+    url = "";
   }
 
   res.send({ code: 200, data: { resArr, page, total } })
@@ -286,7 +286,7 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
     return;
   }
 
-  // 读取category内容的数组，从中确认是否有该category
+  // 读取 category 内容的数组，从中确认是否有该 category
   if (!SqlTool.findCategory(area, category)) res.send({ code: 400, msg: "category错误" });
 
   // 获取该category下的资源目录内容
@@ -343,27 +343,37 @@ dataRouter.get('/get/item', (req, res) => {
   };
   console.log('/get/item => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
+  let { area, category, id } = req.query;
+
   // 校验资源目录id是否存在
-  if (!SqlTool.findItem(req.query.id)) {
+  if (!SqlTool.findItem(id)) {
     res.send({ code: 400, msg: "id错误" })
     return;
   }
 
+  // 查看设置的展示模板
+  let template = SqlTool.getItemShowTempalte(area, category);
+  if (!template) {
+    // 如果模板不存在则反馈给前端
+    res.send({ code: 403, data: { type: "no-Template", msg: "未设置模板" } })
+    return;
+  }
+
   // 该资源目录id的基本路径
-  let basePath = SqlTool.getItemUrl(req.query.id, true);
+  let basePath = SqlTool.getItemUrl(id, true);
   // 读取配置信息
   let readConfigObj = JSON.parse(fs.readFileSync('.' + basePath + 'item.config.json'));
-  let readObj = SqlTool.getItemMsg(req.query.id);
+  let readObj = SqlTool.getItemMsg(id);
 
+  // 移除配置文件，避免出现在返回的信息中
+  let spliceIndex = readConfigObj.files.indexOf('item.config.json');
+  if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
   // 筛选封面
   readObj.cover = readObj.custom_cover ? readObj.custom_cover : readObj.cover;
   delete readObj.custom_cover;
-  // 移除配置文件
-  let spliceIndex = readConfigObj.files.indexOf('item.config.json');
-  if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
-  // readObj.files = readConfigObj.files.map(i => basePath + i)
   readObj.files = readConfigObj.files;
   readObj.url = basePath;
+  readObj.template = template;
 
   res.send({ code: 200, data: readObj })
 })
@@ -394,16 +404,18 @@ dataRouter.get('/check/category', (req, res) => {
   res.send({ code: 200, data: resBoolean });
 })
 
-// // 检测是否有指定资源项目
-// dataRouter.get('/check/item', (req, res) => {
+// 检测是否有指定资源项目
+dataRouter.get('/check/item', (req, res) => {
 
-//   var mem = process.memoryUsage();
-//   var format = function (bytes) {
-//     return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-//   };
-//   console.log('/check/item => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  var mem = process.memoryUsage();
+  var format = function (bytes) {
+    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
+  };
+  console.log('/check/item => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
-// })
+  let resBoolean = SqlTool.findItem(req.query.id)
+  res.send({ code: 200, data: resBoolean });
+})
 
 // 生成目录树
 dataRouter.get('/get/logtree', (req, res) => {
@@ -495,23 +507,5 @@ dataRouter.get('/set/categoryIndex', (req, res) => {
     else res.send({ code: 400, msg: "数据库操作出现错误" })
   } else res.send({ code: 400, msg: "参数错误" })
 })
-
-// // 设置 category
-// dataRouter.get('/get/', (req, res) => {
-
-//   var mem = process.memoryUsage();
-//   var format = function (bytes) {
-//     return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-//   };
-//   console.log('/get/categoryIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
-
-//   if (req.query.categoryObj) {
-//     if (SqlTool.update('categories_index', JSON.parse(req.query.categoryObj))) {
-//       res.send({ code: 200 });
-//     }
-//     else res.send({ code: 400, msg: "数据库操作出现错误" })
-//   } else res.send({ code: 400, msg: "参数错误" })
-// })
-
 
 module.exports.dataRouter = dataRouter;

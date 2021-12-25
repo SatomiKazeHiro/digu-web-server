@@ -347,4 +347,17 @@ module.exports = class SqlTool {
     })
     return true;
   }
+
+  /**
+   * 获取资源项目要展示的模板类型
+   * @param {String} area 域名
+   * @param {String} category 类名
+   * @returns 模板字符串
+   */
+   static getItemShowTempalte(area, category) {
+    const readCategory = db.prepare('select * from categories_index where area = ? and category = ?');
+    let readObj = readCategory.get(area, category);
+    if (readObj) return readObj.item_log_template;
+    else return ""
+  }
 }
