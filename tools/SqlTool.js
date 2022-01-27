@@ -89,7 +89,7 @@ module.exports = class SqlTool {
    * @returns 返回对应的资源项目的信息对象
    */
   static getItemMsg(id) {
-    const readItemMsg = db.prepare('select * from item_msg where id = ?');
+    const readItemMsg = db.prepare('select * from (select distinct * from item_msg left join items_index on item_msg.id = items_index.id) where id = ?');
     let itemObj = readItemMsg.get(id);
     return itemObj;
   }

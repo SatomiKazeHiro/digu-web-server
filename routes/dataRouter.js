@@ -181,16 +181,18 @@ dataRouter.get('/get/areaNormal', (req, res) => {
   let pageStart = limit * (page - 1);
   let pageEnd = total - limit * (page - 1) <= limit ? total : limit * page;
 
-  let readObj, url;
+  let readObj, link_url, sources_url;
   for (let i = pageStart; i < pageEnd; i++) {
     readObj = SqlTool.getItemMsg(iIdArr[i]);
-    url = SqlTool.getItemUrl(readObj.id);
+    link_url = `/${readObj.area}/${readObj.category}/${readObj.id}`;
+    sources_url = `/sources/${readObj.area}/${readObj.category}/${readObj.item}`;
     if (msgType === "all")
       resArr.push({
         id: readObj.id,
         cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
         title: readObj.title,
-        url,
+        link_url,
+        sources_url,
         intro: readObj.intro,
         type: readObj.type,
       });
@@ -199,10 +201,12 @@ dataRouter.get('/get/areaNormal', (req, res) => {
         id: readObj.id,
         cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
         title: readObj.title,
-        url
+        link_url,
+        sources_url,
       });
     readObj = null;
-    url = "";
+    link_url = "";
+    sources_url = "";
   }
 
   res.send({ code: 200, data: { resArr, page, total } })
@@ -306,16 +310,18 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
   let pageStart = limit * (page - 1);
   let pageEnd = total - limit * (page - 1) <= limit ? total : limit * page;
 
-  let readObj, url;
+  let readObj, link_url, sources_url;
   for (let i = pageStart; i < pageEnd; i++) {
     readObj = SqlTool.getItemMsg(iIdArr[i]);
-    url = SqlTool.getItemUrl(readObj.id);
+    link_url = `/${readObj.area}/${readObj.category}/${readObj.id}`;
+    sources_url = `/sources/${readObj.area}/${readObj.category}/${readObj.item}`;
     if (msgType === "all")
       resArr.push({
         id: readObj.id,
         cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
         title: readObj.title,
-        url,
+        link_url,
+        sources_url,
         intro: readObj.intro,
         type: readObj.type,
       });
@@ -324,10 +330,12 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
         id: readObj.id,
         cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
         title: readObj.title,
-        url
+        link_url,
+        sources_url,
       });
     readObj = null;
-    url = "";
+    link_url = "";
+    sources_url = "";
   }
 
   res.send({ code: 200, data: { resArr, page, total } })
