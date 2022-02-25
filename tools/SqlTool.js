@@ -35,11 +35,12 @@ module.exports = class SqlTool {
   /**
    * 获取指定域下的所有类
    * @param {String} area 域
+   * @param {Boolean} allCategoryInfo 是否返回分类的所有信息
    * @returns 类对象数组
    */
-  static getCategories(area, onlyCategory = true) {
+  static getCategories(area, allCategoryInfo = true) {
     const readCategories = db.prepare('select category, web_name from categories_index where area = ?');
-    if (onlyCategory) {
+    if (allCategoryInfo) {
       let resArr = readCategories.all(area).map(i => i.category);
       return resArr;
     } else {
@@ -51,36 +52,26 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 获取所有的资源目录id
+   * 获取指定分类中的所有资源目录id
    * @returns 资源目录的id数组
    */
-  static getItemId() {
-    const readItems = db.prepare('select id from items_index');
-    let resArr = readItems.all().map(i => i.id);
-    return resArr;
-  }
-
-  /**
-   * 获取指定域下的所有资源id
-   * @param {String } area 域名
-   * @returns 返回资源id数组
-   */
-  static getItemIdByArea(area) {
-    const readItems = db.prepare('select * from items_index where area = ?');
-    let resIdArr = readItems.all(area).map(i => i.id);
-    return resIdArr;
-  }
-
-  /**
-   * 获取指定类下所有资源id
-   * @param {String } area 域名
-   * @param {String } category 项目名
-   * @returns 返回资源id数组
-   */
-  static getItemIdByAC(area, category) {
-    const readItems = db.prepare('select * from items_index where area = ? and category = ?');
-    let readIds = readItems.all(area, category).map(i => i.id);
-    return readIds;
+  static getItemId(area, category) {
+    if (area && category) {
+      // 获取指定类下所有资源id
+      const readItems = db.prepare('select * from items_index where area = ? and category = ?');
+      let readIds = readItems.all(area, category).map(i => i.id);
+      return readIds;
+    } else if (area && !category) {
+      // 获取指定域下的所有资源id
+      const readItems = db.prepare('select * from items_index where area = ?');
+      let resIdArr = readItems.all(area).map(i => i.id);
+      return resIdArr;
+    } else if (!area && !category) {
+      // 获取所有的资源目录id
+      const readItems = db.prepare('select id from items_index');
+      let resArr = readItems.all().map(i => i.id);
+      return resArr;
+    }
   }
 
   /**
@@ -354,7 +345,7 @@ module.exports = class SqlTool {
    * @param {String} category 类名
    * @returns 模板字符串
    */
-   static getItemShowTempalte(area, category) {
+  static getItemShowTempalte(area, category) {
     const readCategory = db.prepare('select * from categories_index where area = ? and category = ?');
     let readObj = readCategory.get(area, category);
     if (readObj) return readObj.item_log_template;

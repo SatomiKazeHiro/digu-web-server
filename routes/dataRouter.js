@@ -29,12 +29,12 @@ dataRouter.get('/get/areaAllName', (req, res) => {
 })
 
 // 获取指定域下的所有类的名字
-dataRouter.get('/get/getCategories', (req, res) => {
+dataRouter.get('/get/categoriesAllName', (req, res) => {
   var mem = process.memoryUsage();
   var format = function (bytes) {
     return (bytes / 1024 / 1024).toFixed(2) + 'MB';
   };
-  console.log('/get/getCategories => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  console.log('/get/categoriesAllName => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
   if (req.query.area) {
     let resArr = SqlTool.getCategories(req.query.area, false);
@@ -106,7 +106,7 @@ dataRouter.get('/get/areaRandom', (req, res) => {
   }
 
   // 从内存获取域下所有资源目录的集合
-  let itemIds = SqlTool.getItemIdByArea(area);
+  let itemIds = SqlTool.getItemId(area);
   // 计算总数
   let total = itemIds.length;
   // 判断分页量的有效性
@@ -165,7 +165,7 @@ dataRouter.get('/get/areaNormal', (req, res) => {
   }
 
   // 获取指定域下所有资源目录id的内容
-  let iIdArr = SqlTool.getItemIdByArea(area);
+  let iIdArr = SqlTool.getItemId(area);
 
   // 通过所有资源目录id的total总数和limit限制计算总页数pageTotal
   let total = iIdArr.length;
@@ -234,7 +234,7 @@ dataRouter.get('/get/categoryRandom', (req, res) => {
     res.send({ code: 400, msg: "limit错误" });
 
   // 获取该category下的资源目录内容
-  let itemIds = SqlTool.getItemIdByAC(area, category);
+  let itemIds = SqlTool.getItemId(area, category);
   // 检查limit的范围
   if (limit > itemIds.length) limit = itemIds.length;
 
@@ -294,7 +294,7 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
   if (!SqlTool.findCategory(area, category)) res.send({ code: 400, msg: "category错误" });
 
   // 获取该category下的资源目录内容
-  let iIdArr = SqlTool.getItemIdByAC(area, category);
+  let iIdArr = SqlTool.getItemId(area, category);
 
   // 通过所有资源目录id的total总数和limit限制计算总页数pageTotal
   let total = iIdArr.length;
@@ -451,13 +451,13 @@ dataRouter.get('/get/logtree', (req, res) => {
 })
 
 // 获取 area 的配置信息
-dataRouter.get('/get/aeraIndex', (req, res) => {
+dataRouter.get('/get/areaIndex', (req, res) => {
 
   var mem = process.memoryUsage();
   var format = function (bytes) {
     return (bytes / 1024 / 1024).toFixed(2) + 'MB';
   };
-  console.log('/get/aeraIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  console.log('/get/areaIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
 
   if (req.query.area) {
     let resObj = SqlTool.getAreaMsg(req.query.area);
