@@ -4,7 +4,8 @@
 const Database = require('better-sqlite3');
 const db = new Database("SourcesDB.db");
 
-let sqls = [`CREATE TABLE IF NOT EXISTS areas_index(area TEXT, web_name TEXT, log_template TEXT, state TEXT, init INTEGER)`,
+let sqls = [
+  `CREATE TABLE IF NOT EXISTS areas_index(area TEXT, web_name TEXT, log_template TEXT, state TEXT, init INTEGER)`,
   `CREATE TABLE IF NOT EXISTS categories_index(area TEXT, category TEXT, web_name TEXT, log_template TEXT, state TEXT, item_log_template TEXT, init INTEGER)`,
   `CREATE TABLE IF NOT EXISTS items_index(id INTEGER primary key, area TEXT, category TEXT, item TEXT, init INTEGER)`,
   `CREATE TABLE IF NOT EXISTS item_msg(id INTEGER primary key, cover TEXT, title TEXT, intro TEXT, custom_cover TEXT, type TEXT)`,

@@ -1,28 +1,25 @@
 /**
  * dataRouter处理资源目录请求
  */
-// 内置模块引用
 const express = require("express");
 const fs = require("fs");
-
-const process = require("process")
 
 // 创建路由实例
 const dataRouter = express.Router();
 
 // 路由中间件
-let { dataMiddleware } = require('../middleware');
+const { dataMiddleware } = require('../middleware');
 
-let SqlTool = require('../tools/SqlTool');
+// 数据库工具
+const SqlTool = require('../tools/SqlTool');
+
+// 内存工具
+const memoryTool = require("../tools/memoryTool");
 
 // 获取所有的域的名字
 dataRouter.get('/get/areaAllName', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/areaAllName => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/areaAllName');
 
   let resArr = SqlTool.getAreas()
   res.send({ code: 200, data: resArr })
@@ -30,11 +27,8 @@ dataRouter.get('/get/areaAllName', (req, res) => {
 
 // 获取指定域下的所有类的名字
 dataRouter.get('/get/categoriesAllName', (req, res) => {
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/categoriesAllName => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+
+  memoryTool('/get/categoriesAllName');
 
   if (req.query.area) {
     let resArr = SqlTool.getCategories(req.query.area, false);
@@ -46,11 +40,7 @@ dataRouter.get('/get/categoriesAllName', (req, res) => {
 // 获取随机资源项目内容（用于首页比较多）
 dataRouter.get('/get/itemRandom', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/itemRandom => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/itemRandom');
 
   // 获取请求参数
   let limit = req.query.limit;
@@ -90,11 +80,7 @@ dataRouter.get('/get/itemRandom', (req, res) => {
 // 获取指定域的随机内容
 dataRouter.get('/get/areaRandom', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/areaRandom => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/areaRandom');
 
   // 获取请求参数
   let { area, limit } = req.query;
@@ -141,11 +127,7 @@ dataRouter.get('/get/areaRandom', (req, res) => {
 // 获取指定域的所有内容
 dataRouter.get('/get/areaNormal', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/areaNormal => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/areaNormal');
 
   // 获取请求参数
   let { area, limit, page, msgType } = req.query;
@@ -215,11 +197,7 @@ dataRouter.get('/get/areaNormal', (req, res) => {
 // 获取指定域下分类中的随机内容
 dataRouter.get('/get/categoryRandom', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/categoryRandom => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/categoryRandom');
 
   // 获取请求参数
   let { area, category, limit } = req.query;
@@ -268,11 +246,7 @@ dataRouter.get('/get/categoryRandom', (req, res) => {
 // 获取指定域下分类中的所有内容
 dataRouter.get('/get/categoryNormal', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/categoryNormal => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/categoryNormal');
 
   // 获取请求参数
   let { area, category, limit, page, msgType } = req.query;
@@ -345,11 +319,7 @@ dataRouter.get('/get/categoryNormal', (req, res) => {
 // 获取指定 id 资源项目内容
 dataRouter.get('/get/item', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/item => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/item');
 
   let { area, category, id } = req.query;
 
@@ -389,11 +359,7 @@ dataRouter.get('/get/item', (req, res) => {
 // 检测是否有指定域
 dataRouter.get('/check/area', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/check/area => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/check/area');
 
   let resBoolean = SqlTool.findArea(req.query.area);
   res.send({ code: 200, data: resBoolean });
@@ -402,11 +368,7 @@ dataRouter.get('/check/area', (req, res) => {
 // 检测是否有指定类
 dataRouter.get('/check/category', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/check/category => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/check/category');
 
   let resBoolean = SqlTool.findCategory(req.query.area, req.query.category);
   res.send({ code: 200, data: resBoolean });
@@ -415,11 +377,7 @@ dataRouter.get('/check/category', (req, res) => {
 // 检测是否有指定资源项目
 dataRouter.get('/check/item', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/check/item => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/check/item');
 
   let resBoolean = SqlTool.findItem(req.query.id)
   res.send({ code: 200, data: resBoolean });
@@ -428,11 +386,7 @@ dataRouter.get('/check/item', (req, res) => {
 // 生成目录树
 dataRouter.get('/get/logtree', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/logtree => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/logtree');
 
   let resArr = [];
   SqlTool.getAreas(false).forEach(i => {
@@ -453,11 +407,7 @@ dataRouter.get('/get/logtree', (req, res) => {
 // 获取 area 的配置信息
 dataRouter.get('/get/areaIndex', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/areaIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/areaIndex');
 
   if (req.query.area) {
     let resObj = SqlTool.getAreaMsg(req.query.area);
@@ -468,11 +418,7 @@ dataRouter.get('/get/areaIndex', (req, res) => {
 // 获取 category 的配置信息
 dataRouter.get('/get/categoryIndex', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/get/categoryIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/get/categoryIndex');
 
   if (!req.query.area) res.send({ code: 400, msg: "area为空" });
   else if (!req.query.category) res.send({ code: 400, msg: "category为空" });
@@ -485,11 +431,7 @@ dataRouter.get('/get/categoryIndex', (req, res) => {
 // 设置 area
 dataRouter.get('/set/areaIndex', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/set/areaIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/set/areaIndex');
 
   if (req.query.areaObj) {
     if (SqlTool.update('areas_index', JSON.parse(req.query.areaObj))) {
@@ -502,11 +444,7 @@ dataRouter.get('/set/areaIndex', (req, res) => {
 // 设置 category
 dataRouter.get('/set/categoryIndex', (req, res) => {
 
-  var mem = process.memoryUsage();
-  var format = function (bytes) {
-    return (bytes / 1024 / 1024).toFixed(2) + 'MB';
-  };
-  console.log('/set/categoryIndex => Process: heapTotal ' + format(mem.heapTotal) + ' heapUsed ' + format(mem.heapUsed) + ' rss ' + format(mem.rss));
+  memoryTool('/set/categoryIndex');
 
   if (req.query.categoryObj) {
     if (SqlTool.update('categories_index', JSON.parse(req.query.categoryObj))) {

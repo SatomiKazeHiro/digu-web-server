@@ -29,8 +29,6 @@ module.exports = init = () => {
     fs.mkdirSync("./sources");
     ioLog(initLogPath, '[+] / -> sources', 'increase');
 
-
-
     // 根据配置文件创建默认子文件夹
     baseArea.forEach((area) => {
       fs.mkdirSync('./sources/' + area, { recursive: true });
