@@ -18,7 +18,7 @@ init();
 
 // 引用自定义路由
 let { baseRouter } = require('./routes/baseRouter');
-let { dataRouter } = require('./routes/dataRouter');
+const dataRouter = require('./routes/dataRouter');
 let { webRouter } = require('./routes/webRouter');
 
 
