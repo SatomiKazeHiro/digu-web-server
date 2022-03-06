@@ -15,7 +15,7 @@ module.exports = ioLog = (msg, type = '') => {
   // 生成当前时间
   let time = new Date().toLocaleString().replace(/\//g, '-');
   // 开头格式字符串
-  let startStr = '     - ';
+  let decoratedStr = '     - ';
   // 保存内容模板[INFO]
   let logINFO = `[INFO][${time}] ${msg}${EOL}`;
   if (type.toLowerCase() === 'start') {
@@ -28,23 +28,23 @@ module.exports = ioLog = (msg, type = '') => {
   }
   else switch (type.toLowerCase()) {
     case '':
-      console.log(startStr + msg);
+      console.log(decoratedStr + msg);
       break;
     case 'increase':
       // 输出系统目录增加的信息（黑底青字）
-      console.log(startStr + '\033[40;36m' + msg + '\033[0m');
+      console.log(decoratedStr + '\033[40;36m' + msg + '\033[0m');
       break;
     case 'decrease':
       // 输出系统目录被移除的信息（黑底红字）
-      console.log(startStr + '\033[40;31m' + msg + '\033[0m');
+      console.log(decoratedStr + '\033[40;31m' + msg + '\033[0m');
       break;
     case 'up':
       // 输出目录内容成功装载的信息（黑底绿字）
-      console.log(startStr + '\033[40;32m' + msg + '\033[0m');
+      console.log(decoratedStr + '\033[40;32m' + msg + '\033[0m');
       break;
     case 'warning':
       // 输出目录内容成功装载的信息（黑底黄字）
-      console.log(startStr + '\033[40;33m' + msg + '\033[0m');
+      console.log(decoratedStr + '\033[40;33m' + msg + '\033[0m');
       break;
     default:
       appendFileSync(initLogPath, logINFO, 'utf8');

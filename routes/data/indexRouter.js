@@ -12,6 +12,15 @@ const { dataMiddleware } = require('../../middleware');
 // 数据库工具
 const SqlTool = require('../../tools/SqlTool');
 
+// 转换带有单位的大小
+let sizeFormat = function (size) {
+  if (size < 1024) return size + "B";
+  else if (size / 1024 < 1024) return (size / 1024).toFixed(2) + "KB";
+  else if (size / 1024 / 1024 < 1024)
+    return (size / 1024 / 2014).toFixed(2) + "MB";
+  else if (size / 1024 / 1024 / 1024 < 1024)
+    return (size / 1024 / 2014 / 1024).toFixed(2) + "GB";
+}
 
 // 获取所有的域的名字
 indexRouter.get('/areaAllName', (req, res) => {
@@ -20,7 +29,7 @@ indexRouter.get('/areaAllName', (req, res) => {
 })
 
 // 获取指定域下的所有类的名字
-indexRouter.get('/categoriesAllName', (req, res) => {
+indexRouter.get('/categoryAllName', (req, res) => {
   if (req.query.area) {
     let resArr = SqlTool.getCategories(req.query.area, false);
     res.send({ code: 200, data: resArr });
@@ -155,6 +164,8 @@ indexRouter.get('/areaNormal', (req, res) => {
         sources_url,
         intro: readObj.intro,
         type: readObj.type,
+        amount: readObj.amount,
+        size: sizeFormat(readObj.size)
       });
     else
       resArr.push({
@@ -270,6 +281,8 @@ indexRouter.get('/categoryNormal', (req, res) => {
         sources_url,
         intro: readObj.intro,
         type: readObj.type,
+        amount: readObj.amount,
+        size: sizeFormat(readObj.size)
       });
     else
       resArr.push({

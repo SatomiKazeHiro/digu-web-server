@@ -8,7 +8,7 @@ let sqls = [
   `CREATE TABLE IF NOT EXISTS areas_index(area TEXT, web_name TEXT, log_template TEXT, state TEXT, init INTEGER)`,
   `CREATE TABLE IF NOT EXISTS categories_index(area TEXT, category TEXT, web_name TEXT, log_template TEXT, state TEXT, item_log_template TEXT, init INTEGER)`,
   `CREATE TABLE IF NOT EXISTS items_index(id INTEGER primary key, area TEXT, category TEXT, item TEXT, init INTEGER)`,
-  `CREATE TABLE IF NOT EXISTS item_msg(id INTEGER primary key, cover TEXT, title TEXT, intro TEXT, custom_cover TEXT, type TEXT)`,
+  `CREATE TABLE IF NOT EXISTS item_msg(id INTEGER primary key, cover TEXT, title TEXT, intro TEXT, custom_cover TEXT, type TEXT, amount INTEGER, size INTEGER)`,
   `CREATE TABLE IF NOT EXISTS tags_index(tag TEXT, id INTEGER)`
 ];
 sqls.forEach(sql => db.prepare(sql).run());
@@ -178,7 +178,7 @@ module.exports = class SqlTool {
         sql = `INSERT INTO ${table}(id, area, category, item, init) VALUES(@id, @area, @category, @item, @init)`
         break;
       case 'item_msg':
-        sql = `INSERT INTO ${table}(id, cover, title, intro, custom_cover, type) VALUES(@id, @cover, @title, @intro, @custom_cover, @type)`
+        sql = `INSERT INTO ${table}(id, cover, title, intro, custom_cover, type, amount, size) VALUES(@id, @cover, @title, @intro, @custom_cover, @type, @amount, @size)`
         break;
       case 'tags_index':
         sql = `INSERT INTO ${table}(tag, id) VALUES(@tag, @id)`
@@ -214,7 +214,7 @@ module.exports = class SqlTool {
         sql = `UPDATE ${table} SET area = @area, category = @category, item = @item, init = @init WHERE id = @id`
         break;
       case 'item_msg':
-        sql = `UPDATE ${table} SET cover = @cover, title = @title, intro = @intro, custom_cover = @custom_cover, type = @type WHERE id = @id`
+        sql = `UPDATE ${table} SET cover = @cover, title = @title, intro = @intro, custom_cover = @custom_cover, type = @type, amount = @amount, size = @size WHERE id = @id`
         break;
       case 'tags_index':
         // sql = `UPDATE ${table} SET tag = @tag, id = @id`
