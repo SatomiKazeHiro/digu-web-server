@@ -24,29 +24,36 @@ let sizeFormat = function (size) {
 
 // 获取所有的域的名字
 indexRouter.get('/areaAllName', (req, res) => {
-  let resArr = SqlTool.getAreas();
-  res.send({ code: 200, data: resArr })
+  let resArr = SqlTool.getAreas(req.query.isOnlyArea === "true");
+  res.send({ code: 200, data: resArr });
 })
 
 // 获取指定域下的所有类的名字
 indexRouter.get('/categoryAllName', (req, res) => {
-  if (req.query.area) {
-    let resArr = SqlTool.getCategories(req.query.area, false);
-    res.send({ code: 200, data: resArr });
-  } else res.send({ code: 400, msg: "area错误" });
+
+  let { area } = req.query;
+
+  if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
+
+  let resArr = SqlTool.getCategories(area, false);
+  res.send({ code: 200, data: resArr });
+
 })
 
 // 获取随机资源项目内容（用于首页比较多）
 indexRouter.get('/itemRandom', (req, res) => {
-  let limit = req.query.limit;
+
+  let { limit } = req.query;
+
   // 处理每页限制
-  limit = parseInt(limit)
+  limit = parseInt(limit);
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
     res.send({ code: 400, msg: "limit错误" });
     return;
   }
   let itemIds = SqlTool.getItemId();
   if (limit > itemIds.length) limit = itemIds.length;
+
   // 返回对象
   let resArr = [];
   while (true) {
@@ -74,6 +81,9 @@ indexRouter.get('/itemRandom', (req, res) => {
 indexRouter.get('/areaRandom', (req, res) => {
   // 获取请求参数
   let { area, limit } = req.query;
+
+  if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
+
   // 字符串数据处理
   limit = parseInt(limit)
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
@@ -111,14 +121,15 @@ indexRouter.get('/areaRandom', (req, res) => {
     });
     if (resArr.length == limit) break;
   }
-  res.send({ code: 200, data: resArr })
+  res.send({ code: 200, data: resArr });
 })
 
 // 获取指定域的所有内容
 indexRouter.get('/areaNormal', (req, res) => {
   // 获取请求参数
   let { area, limit, page, msgType } = req.query;
-  // console.log(area, limit, page);
+
+  if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
 
   // 字符串数据处理
   limit = parseInt(limit);
@@ -226,7 +237,7 @@ indexRouter.get('/categoryRandom', (req, res) => {
     if (resArr.length == limit) break;
   }
 
-  res.send({ code: 200, data: resArr })
+  res.send({ code: 200, data: resArr });
 })
 
 // 获取指定域下分类中的所有内容
@@ -234,12 +245,14 @@ indexRouter.get('/categoryNormal', (req, res) => {
   // 获取请求参数
   let { area, category, limit, page, msgType } = req.query;
 
+  if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
+
   // 字符串数据处理
   limit = parseInt(limit);
   page = parseInt(page)
   // 检测limit和page的合理性
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
-    res.send({ code: 400, msg: "limit错误" })
+    res.send({ code: 400, msg: "limit错误" });
     return;
   }
   if (typeof (page) == "undefined" || isNaN(page) || page < 1) {
@@ -307,9 +320,11 @@ indexRouter.get('/item', (req, res) => {
 
   // 校验资源目录id是否存在
   if (!SqlTool.findItem(id)) {
-    res.send({ code: 400, msg: "id错误" })
+    res.send({ code: 400, msg: "id错误" });
     return;
   }
+
+  if (!SqlTool.findCategory(area, category)) res.send({ code: 400, msg: "category错误" });
 
   // 查看设置的展示模板
   let template = SqlTool.getItemShowTempalte(area, category);
@@ -335,7 +350,7 @@ indexRouter.get('/item', (req, res) => {
   readObj.url = basePath;
   readObj.template = template;
 
-  res.send({ code: 200, data: readObj })
+  res.send({ code: 200, data: readObj });
 })
 
 module.exports = indexRouter;

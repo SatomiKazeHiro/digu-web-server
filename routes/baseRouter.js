@@ -17,4 +17,4 @@ baseRouter.get('/404', baseMiddleware, (req, res) => {
 })
 
 
-module.exports.baseRouter = baseRouter;
+module.exports = baseRouter;

@@ -17,9 +17,9 @@ ioLog('', 'start');
 init();
 
 // 引用自定义路由
-let { baseRouter } = require('./routes/baseRouter');
+const baseRouter = require('./routes/baseRouter');
 const dataRouter = require('./routes/dataRouter');
-let { webRouter } = require('./routes/webRouter');
+// const webRouter = require('./routes/webRouter');
 
 
 // 静态资源设置
@@ -30,7 +30,7 @@ server.use('/', baseRouter);
 
 // 自定义路由
 server.use('/api', dataRouter);
-server.use('/', webRouter);
+// server.use('/', webRouter);
 
 server.get('*', (req, res) => {
   res.redirect("/404");

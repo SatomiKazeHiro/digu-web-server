@@ -127,7 +127,6 @@ let scanItem = (parentPath, folderName, isSerialize = false) => {
     }
     // 每次获取size都有1个字节的浮动，超过1个字节视为改动
     if (!('size' in itemObj) || Math.abs(itemObj.size - size) > 2) {
-      console.log(typeof itemObj.size, itemObj.size, typeof size, size);
       itemObj.size = size;
       itemObj.up = true;
     }

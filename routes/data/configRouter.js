@@ -12,6 +12,12 @@ const { dataMiddleware } = require('../../middleware');
 // 数据库工具
 const SqlTool = require('../../tools/SqlTool');
 
+// post 方法处理
+var bodyParser = require('body-parser');
+// 添加json解析
+configRouter.use(bodyParser.json());
+configRouter.use(bodyParser.urlencoded({ extended: false }));
+
 
 // 生成目录树
 configRouter.get('/get/logtree', (req, res) => {
@@ -50,9 +56,9 @@ configRouter.get('/get/categoryIndex', (req, res) => {
 })
 
 // 设置 area
-configRouter.get('/set/areaIndex', (req, res) => {
-  if (req.query.areaObj) {
-    if (SqlTool.update('areas_index', JSON.parse(req.query.areaObj))) {
+configRouter.post('/set/areaIndex', (req, res) => {
+  if (req.body) {
+    if (SqlTool.update('areas_index', req.body)) {
       res.send({ code: 200 });
     }
     else res.send({ code: 400, msg: "数据库操作出现错误" })
@@ -60,9 +66,9 @@ configRouter.get('/set/areaIndex', (req, res) => {
 })
 
 // 设置 category
-configRouter.get('/set/categoryIndex', (req, res) => {
-  if (req.query.categoryObj) {
-    if (SqlTool.update('categories_index', JSON.parse(req.query.categoryObj))) {
+configRouter.post('/set/categoryIndex', (req, res) => {
+  if (req.body) {
+    if (SqlTool.update('categories_index', req.body)) {
       res.send({ code: 200 });
     }
     else res.send({ code: 400, msg: "数据库操作出现错误" })

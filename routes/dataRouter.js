@@ -9,7 +9,7 @@ const checkRouter = require("./data/checkRouter");
 const configRouter = require("./data/configRouter")
 
 dataRouter.use("/get", indexRouter);
-dataRouter.use("/chack", checkRouter);
+dataRouter.use("/check", checkRouter);
 dataRouter.use("/", configRouter);
 
 module.exports = dataRouter;

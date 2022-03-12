@@ -20,4 +20,4 @@ webRouter.get('/:area/:category/:itemId', webMiddleware, (req, res) => {
   res.send(req.params);
 })
 
-module.exports.webRouter = webRouter;
+module.exports = webRouter;
