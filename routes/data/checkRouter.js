@@ -1,7 +1,7 @@
 /**
  * 检测用的路由
  */
-const fs = require("fs");
+const process = require("process");
 
 const express = require("express");
 const checkRouter = express.Router();
@@ -10,7 +10,7 @@ const checkRouter = express.Router();
 const { dataMiddleware } = require('../../middleware');
 
 // 数据库工具
-const SqlTool = require('../../tools/SqlTool');
+const SqlTool = process.__class.SqlTool;
 
 
 // 检测是否有指定域

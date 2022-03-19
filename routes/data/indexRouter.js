@@ -1,6 +1,7 @@
 /**
  * 主站页面的路由
  */
+const process = require("process");
 const fs = require("fs");
 
 const express = require("express");
@@ -10,7 +11,8 @@ const indexRouter = express.Router();
 const { dataMiddleware } = require('../../middleware');
 
 // 数据库工具
-const SqlTool = require('../../tools/SqlTool');
+
+const SqlTool = process.__class.SqlTool;
 
 // 转换带有单位的大小
 let sizeFormat = function (size) {
@@ -318,37 +320,37 @@ indexRouter.get('/categoryNormal', (req, res) => {
 indexRouter.get('/item', (req, res) => {
   let { area, category, id } = req.query;
 
-  // 校验资源目录id是否存在
+  // 检测资源目录id是否存在
   if (!SqlTool.findItem(id)) {
     res.send({ code: 400, msg: "id错误" });
     return;
   }
 
+  // 检测域、分类是否正确
   if (!SqlTool.findCategory(area, category)) res.send({ code: 400, msg: "category错误" });
 
   // 查看设置的展示模板
   let template = SqlTool.getItemShowTempalte(area, category);
   if (!template) {
     // 如果模板不存在则反馈给前端
-    res.send({ code: 403, data: { type: "no-Template", msg: "未设置模板" } })
+    res.send({ code: 400, data: { type: "no-Template", msg: "未设置模板" } })
     return;
   }
 
-  // 该资源目录id的基本路径
-  let basePath = SqlTool.getItemUrl(id, true);
-  // 读取配置信息
-  let readConfigObj = JSON.parse(fs.readFileSync('.' + basePath + 'item.config.json'));
   let readObj = SqlTool.getItemMsg(id);
-
-  // 移除配置文件，避免出现在返回的信息中
-  let spliceIndex = readConfigObj.files.indexOf('item.config.json');
-  if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
+  readObj.template = template;
   // 筛选封面
   readObj.cover = readObj.custom_cover ? readObj.custom_cover : readObj.cover;
   delete readObj.custom_cover;
-  readObj.files = readConfigObj.files;
-  readObj.url = basePath;
-  readObj.template = template;
+
+  if (readObj.sources_url) {
+    // 读取配置信息
+    let readConfigObj = JSON.parse(fs.readFileSync('.' + readObj.sources_url + 'item.config.json'));
+    // 移除配置文件，避免出现在返回的信息中
+    let spliceIndex = readConfigObj.files.indexOf('item.config.json');
+    if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
+    readObj.files = readConfigObj.files;
+  }
 
   res.send({ code: 200, data: readObj });
 })

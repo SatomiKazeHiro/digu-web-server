@@ -83,6 +83,9 @@ module.exports = class SqlTool {
   static getItemMsg(id) {
     const readItemMsg = db.prepare('select * from (select distinct * from item_msg left join items_index on item_msg.id = items_index.id) where id = ?');
     let itemObj = readItemMsg.get(id);
+    delete itemObj["id:1"];
+    itemObj.link_url = `/${itemObj.area}/${itemObj.category}/${itemObj.id}`;
+    itemObj.sources_url = `/sources/${itemObj.area}/${itemObj.category}/${itemObj.item}/`;
     return itemObj;
   }
 

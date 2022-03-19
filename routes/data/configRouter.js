@@ -1,7 +1,7 @@
 /**
  * 配置信息的路由
  */
-const fs = require("fs");
+const process = require("process");
 
 const express = require("express");
 const configRouter = express.Router();
@@ -10,7 +10,7 @@ const configRouter = express.Router();
 const { dataMiddleware } = require('../../middleware');
 
 // 数据库工具
-const SqlTool = require('../../tools/SqlTool');
+const SqlTool = process.__class.SqlTool;
 
 // post 方法处理
 var bodyParser = require('body-parser');

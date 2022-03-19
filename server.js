@@ -1,26 +1,29 @@
-// 内置模块
+// 引入内置模块
 const path = require("path");
+const process = require("process");
 
 const express = require("express");
 const server = new express();
 
-// 配置模块参数
-const port = require("./config").port;
+// 加载全局配置信息
+const configLoader = require("./config").configLoader;
+configLoader();
 
-// 自定义模块方法
-let ioLog = require('./tools/ioLog');
-let init = require("./tools/init");
-let memoryTool = require("./tools/memoryTool")
+// 加载全局方法
+const tools = require("./tools");
+tools.funcLoader();
+tools.classLoader();
 
-ioLog('', 'start');
-// 初始化程序
-init();
+process.__state = new Object();
+process.__state.INIT_READY = true;
+
+process.__func.ioLog('', 'start');
+process.__func.init();
 
 // 引用自定义路由
 const baseRouter = require('./routes/baseRouter');
 const dataRouter = require('./routes/dataRouter');
 // const webRouter = require('./routes/webRouter');
-
 
 // 静态资源设置
 server.use('/sources', express.static(path.join(__dirname + '/sources')));
@@ -36,8 +39,8 @@ server.get('*', (req, res) => {
   res.redirect("/404");
 })
 
-server.listen(port, () => {
-  ioLog(port, 'DONE')
-  memoryTool('/server');
+server.listen(process.__config.SERVER_PORT, () => {
+  process.__func.ioLog(process.__config.SERVER_PORT, 'DONE')
+  process.__func.memory('/server');
 })
 
