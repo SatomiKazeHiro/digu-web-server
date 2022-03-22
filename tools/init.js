@@ -54,7 +54,7 @@ module.exports = init = () => {
           categoryArr.forEach(category => {
             // 判断数据库在某域的前提下是否有某一分类（category），有则设置init为1，没有则插入新数据
             if (SqlTool.findCategory(area, category)) SqlTool.setInitTrue(area, category);
-            else if (SqlTool.insert('categories_index', { area, category, web_name: category, log_template: "normal", state: "hide", item_log_template: "", init: 1 })) ioLog(process.__config.INIT_LOG_PATH, '[+] /sources -> ' + category, 'increase');
+            else if (SqlTool.insert('categories_index', { area, category, web_name: category, log_template: "normal", state: "hide", item_log_template: "", init: 1 })) ioLog('[+] /sources -> ' + category, 'increase');
 
             let itemArr = scanFolder(`./sources/${area}/`, category, 'category');
             if (itemArr.length > 0) {

@@ -24,30 +24,30 @@ module.exports = ioLog = (msg, type = '') => {
     // 输出服务器启动成功的信息（绿底黑字-黑底绿字）
     console.log('\033[42;30m DONE \033[40;32m  服务器启动成功 http://localhost:' + msg + '\033[0m');
     appendFileSync(__config.START_UP_LOG_PATH, '[INFO][' + time + '] 服务器启动成功，端口为' + msg + EOL, 'utf8');
-  }else if(type.toLowerCase() === 'error'){
+  } else if (type.toLowerCase() === 'error') {
     console.log('\033[41;30m ERROR \033[40;31m ' + msg + '\033[0m');
-  }else switch (type.toLowerCase()) {
-    case '':
-      console.log(decoratedStr + msg);
-      break;
-    case 'increase':
-      // 输出系统目录增加的信息（黑底青字）
-      console.log(decoratedStr + '\033[40;36m' + msg + '\033[0m');
-      break;
-    case 'decrease':
-      // 输出系统目录被移除的信息（黑底红字）
-      console.log(decoratedStr + '\033[40;31m' + msg + '\033[0m');
-      break;
-    case 'up':
-      // 输出目录内容成功装载的信息（黑底绿字）
-      console.log(decoratedStr + '\033[40;32m' + msg + '\033[0m');
-      break;
-    case 'warning':
-      // 输出目录内容成功装载的信息（黑底黄字）
-      console.log(decoratedStr + '\033[40;33m' + msg + '\033[0m');
-      break;
-    default:
-      appendFileSync(__config.INIT_LOG_PATH, logINFO, 'utf8');
-      break;
+  } else {
+    switch (type.toLowerCase()) {
+      case '':
+        console.log(decoratedStr + msg);
+        break;
+      case 'increase':
+        // 输出系统目录增加的信息（黑底青字）
+        console.log(decoratedStr + '\033[40;36m' + msg + '\033[0m');
+        break;
+      case 'decrease':
+        // 输出系统目录被移除的信息（黑底红字）
+        console.log(decoratedStr + '\033[40;31m' + msg + '\033[0m');
+        break;
+      case 'up':
+        // 输出目录内容成功装载的信息（黑底绿字）
+        console.log(decoratedStr + '\033[40;32m' + msg + '\033[0m');
+        break;
+      case 'warning':
+        // 输出目录内容成功装载的信息（黑底黄字）
+        console.log(decoratedStr + '\033[40;33m' + msg + '\033[0m');
+        break;
+    }
+    appendFileSync(__config.INIT_LOG_PATH, logINFO, 'utf8');
   }
 }

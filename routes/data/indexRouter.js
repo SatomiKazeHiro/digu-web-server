@@ -39,7 +39,6 @@ indexRouter.get('/categoryAllName', (req, res) => {
 
   let resArr = SqlTool.getCategories(area, false);
   res.send({ code: 200, data: resArr });
-
 })
 
 // 获取随机资源项目内容（用于首页比较多）
@@ -50,8 +49,7 @@ indexRouter.get('/itemRandom', (req, res) => {
   // 处理每页限制
   limit = parseInt(limit);
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
-    res.send({ code: 400, msg: "limit错误" });
-    return;
+    return res.send({ code: 400, msg: "limit错误" });
   }
   let itemIds = SqlTool.getItemId();
   if (limit > itemIds.length) limit = itemIds.length;
@@ -66,12 +64,12 @@ indexRouter.get('/itemRandom', (req, res) => {
       continue;
     }
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
-    let url = SqlTool.getItemUrl(itemObj.id);
     resArr.push({
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
-      url
+      url: itemObj.sources_url,
+      link_url: itemObj.link_url
     });
 
     if (resArr.length == limit) break;
@@ -89,8 +87,7 @@ indexRouter.get('/areaRandom', (req, res) => {
   // 字符串数据处理
   limit = parseInt(limit)
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
-    res.send({ code: 400, msg: "limit错误" });
-    return;
+    return res.send({ code: 400, msg: "limit错误" });
   }
 
   // 从内存获取域下所有资源目录的集合
@@ -105,21 +102,21 @@ indexRouter.get('/areaRandom', (req, res) => {
   while (true) {
     // 从最大数量中获取随机数
     let index = itemIds.length * Math.random() << 0;
-    // 在封装对象之前先判断返回对象是否包含了该项，包含了则跳过
-    if (resArr.map(i => i.id).includes(itemIds[index])) {
-      continue;
-    }
     // 判断是否右要排除在外的资源项目（场景：避免某资源项目下的随机项目和本身相同）
     if (req.query.excludeID && itemIds[index] == req.query.excludeID) {
       continue;
     }
+    // 在封装对象之前先判断返回对象是否包含了该项，包含了则跳过
+    if (resArr.map(i => i.id).includes(itemIds[index])) {
+      continue;
+    }
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
-    let url = SqlTool.getItemUrl(itemObj.id);
     resArr.push({
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
-      url,
+      url: itemObj.sources_url,
+      link_url: itemObj.link_url
     });
     if (resArr.length == limit) break;
   }
@@ -138,12 +135,10 @@ indexRouter.get('/areaNormal', (req, res) => {
   page = parseInt(page);
   // 检测 limit 和 page 的合理性
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
-    res.send({ code: 400, msg: "limit错误" });
-    return;
+    return res.send({ code: 400, msg: "limit错误" });
   }
   if (typeof (page) == "undefined" || isNaN(page) || page < 1) {
-    res.send({ code: 400, msg: "page错误" });
-    return;
+    return res.send({ code: 400, msg: "page错误" });
   }
 
   // 获取指定域下所有资源目录id的内容
@@ -207,8 +202,9 @@ indexRouter.get('/categoryRandom', (req, res) => {
   // 字符串数据处理
   limit = parseInt(limit);
   // 检测limit的合理性
-  if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1)
-    res.send({ code: 400, msg: "limit错误" });
+  if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
+    return res.send({ code: 400, msg: "limit错误" });
+  }
 
   // 获取该category下的资源目录内容
   let itemIds = SqlTool.getItemId(area, category);
@@ -247,23 +243,25 @@ indexRouter.get('/categoryNormal', (req, res) => {
   // 获取请求参数
   let { area, category, limit, page, msgType } = req.query;
 
-  if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
+  if (!SqlTool.findArea(area)) {
+    return res.send({ code: 400, msg: "area错误" });
+  }
 
   // 字符串数据处理
   limit = parseInt(limit);
   page = parseInt(page)
   // 检测limit和page的合理性
   if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
-    res.send({ code: 400, msg: "limit错误" });
-    return;
+    return res.send({ code: 400, msg: "limit错误" });
   }
   if (typeof (page) == "undefined" || isNaN(page) || page < 1) {
-    res.send({ code: 400, msg: "page错误" });
-    return;
+    return res.send({ code: 400, msg: "page错误" });
   }
 
   // 读取 category 内容的数组，从中确认是否有该 category
-  if (!SqlTool.findCategory(area, category)) res.send({ code: 400, msg: "category错误" });
+  if (!SqlTool.findCategory(area, category)) {
+    return res.send({ code: 400, msg: "category错误" });
+  }
 
   // 获取该category下的资源目录内容
   let iIdArr = SqlTool.getItemId(area, category);
@@ -313,7 +311,6 @@ indexRouter.get('/categoryNormal', (req, res) => {
   }
 
   res.send({ code: 200, data: { resArr, page, total } })
-
 })
 
 // 获取指定 id 资源项目内容
@@ -322,19 +319,19 @@ indexRouter.get('/item', (req, res) => {
 
   // 检测资源目录id是否存在
   if (!SqlTool.findItem(id)) {
-    res.send({ code: 400, msg: "id错误" });
-    return;
+    return res.send({ code: 400, msg: "id错误" });
   }
 
   // 检测域、分类是否正确
-  if (!SqlTool.findCategory(area, category)) res.send({ code: 400, msg: "category错误" });
+  if (!SqlTool.findCategory(area, category)) {
+    return res.send({ code: 400, msg: "category错误" });
+  }
 
   // 查看设置的展示模板
   let template = SqlTool.getItemShowTempalte(area, category);
   if (!template) {
     // 如果模板不存在则反馈给前端
-    res.send({ code: 400, data: { type: "no-Template", msg: "未设置模板" } })
-    return;
+    return res.send({ code: 400, data: { type: "no-Template", msg: "未设置模板" } })
   }
 
   let readObj = SqlTool.getItemMsg(id);
@@ -344,12 +341,17 @@ indexRouter.get('/item', (req, res) => {
   delete readObj.custom_cover;
 
   if (readObj.sources_url) {
-    // 读取配置信息
-    let readConfigObj = JSON.parse(fs.readFileSync('.' + readObj.sources_url + 'item.config.json'));
-    // 移除配置文件，避免出现在返回的信息中
-    let spliceIndex = readConfigObj.files.indexOf('item.config.json');
-    if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
-    readObj.files = readConfigObj.files;
+    let configPath = '.' + readObj.sources_url + 'item.config.json';
+    if (fs.existsSync(configPath)) {
+      // 读取配置信息
+      let readConfigObj = JSON.parse(fs.readFileSync(configPath));
+      // 移除配置文件，避免出现在返回的信息中
+      let spliceIndex = readConfigObj.files.indexOf('item.config.json');
+      if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
+      readObj.files = readConfigObj.files;
+    } else {
+      // 不存在则进行扫描操作
+    }
   }
 
   res.send({ code: 200, data: readObj });

@@ -113,19 +113,6 @@ module.exports = class SqlTool {
   }
 
   /**
-   * 生成网络资源项目路由
-   * @param {Number} id 资源目录
-   * @returns 字符串路径
-   */
-  static getItemUrl(id, neetItemPath = false) {
-    const readItemIndex = db.prepare('select * from items_index where id = ?')
-    let readObj = readItemIndex.get(id);
-    if (!neetItemPath)
-      return `/sources/${readObj.area}/${readObj.category}/`
-    else return `/sources/${readObj.area}/${readObj.category}/${readObj.item}/`
-  }
-
-  /**
    * 检测指定域是否存在
    * @param {String} area 域名
    * @returns 存在返回true，否则返回false
