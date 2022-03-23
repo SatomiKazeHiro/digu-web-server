@@ -97,5 +97,5 @@ module.exports = init = () => {
       ioLog(msg, type);
     });
     process.__state.INIT_READY = false;
-  } else ioLog("资源项目扫描失败，系统状态未允许", "ERROR");
+  } else ioLog("资源项目扫描失败，系统初始化状态未就绪", "ERROR");
 }

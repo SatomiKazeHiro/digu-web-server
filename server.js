@@ -15,7 +15,7 @@ tools.funcLoader();
 tools.classLoader();
 
 process.__state = new Object();
-process.__state.INIT_READY = true;
+process.__state.INIT_READY = false;
 
 process.__func.ioLog('', 'start');
 process.__func.init();

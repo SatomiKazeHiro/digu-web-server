@@ -19,9 +19,9 @@ let sizeFormat = function (size) {
   if (size < 1024) return size + "B";
   else if (size / 1024 < 1024) return (size / 1024).toFixed(2) + "KB";
   else if (size / 1024 / 1024 < 1024)
-    return (size / 1024 / 2014).toFixed(2) + "MB";
+    return (size / 1024 / 1024).toFixed(2) + "MB";
   else if (size / 1024 / 1024 / 1024 < 1024)
-    return (size / 1024 / 2014 / 1024).toFixed(2) + "GB";
+    return (size / 1024 / 1024 / 1024).toFixed(2) + "GB";
 }
 
 // 获取所有的域的名字
@@ -68,7 +68,7 @@ indexRouter.get('/itemRandom', (req, res) => {
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
-      url: itemObj.sources_url,
+      source_url: itemObj.sources_url,
       link_url: itemObj.link_url
     });
 
@@ -115,7 +115,7 @@ indexRouter.get('/areaRandom', (req, res) => {
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
-      url: itemObj.sources_url,
+      source_url: itemObj.sources_url,
       link_url: itemObj.link_url
     });
     if (resArr.length == limit) break;
@@ -225,6 +225,7 @@ indexRouter.get('/categoryRandom', (req, res) => {
     }
 
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
+    console.log(itemObj);
     resArr.push({
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
@@ -355,6 +356,21 @@ indexRouter.get('/item', (req, res) => {
   }
 
   res.send({ code: 200, data: readObj });
+})
+
+// 生成导航路径
+indexRouter.get('/acPath', (req, res) => {
+  let { area, category } = req.query;
+
+  if (!SqlTool.findCategory(area, category)) {
+    if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
+    else return res.send({ code: 400, msg: "category错误" });
+  }
+
+  let areaObj = SqlTool.getAreaMsg(area);
+  let categoryObj = SqlTool.getCategoryMsg(area, category);
+
+  res.send({ code: 200, data: { area: areaObj.area, area_web_name: areaObj.web_name, category: categoryObj.category, category_web_name: categoryObj.web_name } });
 })
 
 module.exports = indexRouter;
