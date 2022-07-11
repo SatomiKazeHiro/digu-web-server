@@ -9,8 +9,8 @@ const configRouter = express.Router();
 // 路由中间件
 const { dataMiddleware } = require('../../middleware');
 
-// 数据库工具
-const SqlTool = process.__class.SqlTool;
+// 资源数据库工具
+const SqlTool = process.__sql.SOURCES_SQL_TOOL;
 
 // post 方法处理
 var bodyParser = require('body-parser');

@@ -1,22 +1,25 @@
 const process = require("process");
-const ioLog = require("./ioLog");
-const init = require("./init");
-const memory = require("./memory");
-const SqlTool = require("./SqlTool");
 
-// 方法加载器
-let funcLoader = function () {
-  process.__func = new Object();
-  process.__func.ioLog = ioLog;
-  process.__func.init = init;
-  process.__func.memory = memory;
-}
+const ioLog = require("./ioLog"),
+  memory = require("./memory"),
+  sortAsWin = require("./sortAsWin"),
+  { getSizeAndAmount } = require("./folderTool"),
+  { sources } = require("./sqlTool");
 
-// 类加载器
-let classLoader = function () {
-  process.__class = new Object();
-  process.__class.SqlTool = SqlTool;
-}
+// 工具
+let toolsLoader = function () {
+  process.__tools = new Object();
+  process.__tools.ioLog = ioLog;
+  process.__tools.memory = memory;
+  process.__tools.sortAsWin = sortAsWin;
+  process.__tools.getSizeAndAmount = getSizeAndAmount;
+};
 
-module.exports.funcLoader = funcLoader;
-module.exports.classLoader = classLoader;
+// 数据库
+let sqlLoader = function () {
+  process.__sql = new Object();
+  process.__sql.SOURCES_SQL_TOOL = sources;
+};
+
+module.exports.toolsLoader = toolsLoader;
+module.exports.sqlLoader = sqlLoader;

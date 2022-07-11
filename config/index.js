@@ -1,7 +1,26 @@
+const fs = require("fs");
 const process = require("process");
 
-const fs = require("fs");
-const config = JSON.parse(fs.readFileSync("./config/index.json"));
+// 配置文件
+let config;
+
+if (!fs.existsSync("./config/config.json")) {
+  config = {
+    serverPort: 2233,
+    baseArea: ["anime", "manga"],
+    doubleDeckFolder: [],
+    gameFolder: [],
+  };
+  let data = JSON.stringify(config, null, "\t");
+  fs.writeFileSync("./config/config.json", data, { encoding: "utf-8" });
+}
+
+config = config || JSON.parse(fs.readFileSync("./config/config.json"));
+
+// 检测数据库目录
+if (!fs.existsSync("./db")) {
+  fs.mkdirSync("./db");
+}
 
 // {
 //   "serverPort": 2233,
@@ -34,12 +53,14 @@ const config = JSON.parse(fs.readFileSync("./config/index.json"));
 // // 游戏目录，需要特别扫描
 // const gameFolder = config.gameFolder;
 
+let currentMonth = new Date().getFullYear() + "-" + (new Date().getMonth() + 1);
+
 let configLoader = function () {
   process.__config = new Object();
   process.__config.SERVER_PORT = config.serverPort;
-  process.__config.INIT_LOG_PATH = './logs/init ' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '.log';
-  process.__config.START_UP_LOG_PATH = './logs/start ' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '.log';
+  process.__config.INIT_LOG_PATH = "./logs/init " + currentMonth + ".log";
+  process.__config.START_UP_LOG_PATH = "./logs/start " + currentMonth + ".log";
   process.__config.BASE_AREA = config.baseArea;
-}
+};
 
 module.exports.configLoader = configLoader;

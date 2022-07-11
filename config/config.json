@@ -1,0 +1,9 @@
+{
+	"serverPort": 2233,
+	"baseArea": [
+		"anime",
+		"manga"
+	],
+	"doubleDeckFolder": [],
+	"gameFolder": []
+}

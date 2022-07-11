@@ -1,4 +1,4 @@
-let SqlTool = require('../tools/SqlTool');
+let SqlTool = require('../tools/sqlTool/sources');
 
 let areaArr = SqlTool.getAreas();
 
