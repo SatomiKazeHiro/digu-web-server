@@ -60,9 +60,7 @@ module.exports = class SourcesDB {
   static getItemId(area, category) {
     if (area && category) {
       // 获取指定类下所有资源id
-      const readItems = db.prepare(
-        "select * from items_index where area = ? and category = ?"
-      );
+      const readItems = db.prepare("select * from items_index where area = ? and category = ?");
       let readIds = readItems.all(area, category).map((i) => i.id);
       return readIds;
     } else if (area && !category) {
@@ -231,6 +229,26 @@ module.exports = class SourcesDB {
   }
 
   /**
+   * 更新某个字段的值
+   * @param {String} table 表名
+   * @param {Object} seasoning 字段与值
+   * @param {String} filter 过滤条件
+   */
+  static updateKey(table, seasoning, filter) {
+    if (table && seasoning) {
+      let str = [];
+      let keys = Object.keys(seasoning);
+      let values = Object.values(seasoning);
+      for (let i = 0; i < keys.length; i++) {
+        str.push(`${keys[i]} = '${values[i]}'`);
+      }
+      str.join(",");
+      let sql = `UPDATE ${table} SET ${str} ${filter ? "where " + filter : ""}`;
+      db.prepare(sql).run();
+    }
+  }
+
+  /**
    * 用于重置所有表的 init 字段为 0，检测到资源的时候设置为 1，当服务器初始化完成后，还是 0 的数据将清除
    */
   static setInitFalse() {
@@ -291,9 +309,7 @@ module.exports = class SourcesDB {
       }
     }
     if (IFCs.length > 0) {
-      const deleteIFC = db.prepare(
-        "delete from categories_index where init = 0"
-      );
+      const deleteIFC = db.prepare("delete from categories_index where init = 0");
       try {
         deleteIFC.run();
         // 判断ioLog是否是一个方法，是的话则执行（一定要添加try catch块，否则不起作用）
@@ -333,10 +349,7 @@ module.exports = class SourcesDB {
         deleteIFITag.run(i.id);
         // 判断ioLog是否是一个方法，是的话则执行（一定要添加try catch块，否则不起作用）
         if (typeof eval(ioLog) == "function") {
-          ioLog(
-            `[-] /sources/${i.area}/${i.category} -> ${i.item}`,
-            "decrease"
-          );
+          ioLog(`[-] /sources/${i.area}/${i.category} -> ${i.item}`, "decrease");
         }
       } catch (e) {
         console.log(e);

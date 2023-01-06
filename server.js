@@ -5,6 +5,9 @@ const process = require("process");
 const express = require("express");
 const server = new express();
 
+server.use(express.urlencoded({ extended: false }));
+server.use(express.json());
+
 // 加载全局配置信息
 const { configLoader } = require("./config");
 configLoader();
@@ -30,7 +33,7 @@ const dataRouter = require("./routes/dataRouter");
 // const webRouter = require('./routes/webRouter');
 
 // 静态资源设置
-server.use("/sources", express.static(path.join(__dirname + "/sources")));
+server.use("/sources", express.static(path.join(process.cwd() + "/sources")));
 
 // 基础路由
 server.use("/", baseRouter);

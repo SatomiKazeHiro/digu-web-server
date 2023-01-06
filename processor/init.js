@@ -14,7 +14,6 @@ module.exports = init = () => {
   const SqlTool = process.__sql.SOURCES_SQL_TOOL;
 
   if (process.__state.INIT_READY) {
-
     // 检测日记目录
     if (!fs.existsSync("./logs")) {
       // 资源目录不存在则创建
@@ -70,8 +69,7 @@ module.exports = init = () => {
         if (categoryArr.length > 0) {
           categoryArr.forEach((category) => {
             // 判断数据库在某域的前提下是否有某一分类（category），有则设置init为1，没有则插入新数据
-            if (SqlTool.findCategory(area, category))
-              SqlTool.setInitTrue(area, category);
+            if (SqlTool.findCategory(area, category)) SqlTool.setInitTrue(area, category);
             else if (
               SqlTool.insert("categories_index", {
                 area,
@@ -85,12 +83,12 @@ module.exports = init = () => {
             )
               ioLog("[+] /sources -> " + category, "increase");
 
-            let itemArr = scanFolder(
-              `./sources/${area}/`,
-              category,
-              "category"
-            );
+            // 默认目录离散
+            let type = "scatter";
+            let itemArr = scanFolder(`./sources/${area}/`, category, "category");
             if (itemArr.length > 0) {
+              // 当类目录存在一个子目录的时候，作为聚变
+              type = "fusion";
               itemArr.forEach((item) => {
                 let itemObj = scanItem(`./sources/${area}/${category}/`, item);
 
@@ -109,10 +107,7 @@ module.exports = init = () => {
                       amount: itemObj.amount,
                       size: itemObj.size,
                     });
-                    ioLog(
-                      `[+] /sources/${area}/${category}/${item} -> UP`,
-                      "up"
-                    );
+                    ioLog(`[+] /sources/${area}/${category}/${item} -> UP`, "up");
                   }
                 } else {
                   // 插入数据到资源信息表和索引表
@@ -141,19 +136,15 @@ module.exports = init = () => {
                     //     SqlTool.insert('tags_index', { tag, id: itemObj.id })
                     //   })
                     // 输出更新信息
-                    ioLog(
-                      `[+] /sources/${area}/${category} -> ${item}`,
-                      "increase"
-                    );
+                    ioLog(`[+] /sources/${area}/${category} -> ${item}`, "increase");
                     // 如果是搬迁过来的资源，其带有item.config.json的，在写入数据库之后也需要up输出
-                    ioLog(
-                      `[+] /sources/${area}/${category}/${item} -> UP`,
-                      "up"
-                    );
+                    ioLog(`[+] /sources/${area}/${category}/${item} -> UP`, "up");
                   }
                 }
               });
             }
+            // 更新类目录
+            SqlTool.updateKey("categories_index", { type }, `area = '${area}' and category = '${category}'`);
           });
         }
       });

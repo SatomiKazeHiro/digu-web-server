@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "pkg": "pkg . -t node14-win-x64 --out-path=dist/"
   },
+  "bin": "./server.js",
   "keywords": [],
   "author": "",
   "license": "ISC",

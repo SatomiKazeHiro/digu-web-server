@@ -3,12 +3,13 @@
  */
 const process = require("process");
 const fs = require("fs");
+const path = require("path");
 
 const express = require("express");
 const indexRouter = express.Router();
 
 // 路由中间件
-const { dataMiddleware } = require('../../middleware');
+const { dataMiddleware } = require("../../middleware");
 
 // 资源数据库工具
 const SqlTool = process.__sql.SOURCES_SQL_TOOL;
@@ -17,37 +18,33 @@ const SqlTool = process.__sql.SOURCES_SQL_TOOL;
 let sizeFormat = function (size) {
   if (size < 1024) return size + "B";
   else if (size / 1024 < 1024) return (size / 1024).toFixed(2) + "KB";
-  else if (size / 1024 / 1024 < 1024)
-    return (size / 1024 / 1024).toFixed(2) + "MB";
-  else if (size / 1024 / 1024 / 1024 < 1024)
-    return (size / 1024 / 1024 / 1024).toFixed(2) + "GB";
-}
+  else if (size / 1024 / 1024 < 1024) return (size / 1024 / 1024).toFixed(2) + "MB";
+  else if (size / 1024 / 1024 / 1024 < 1024) return (size / 1024 / 1024 / 1024).toFixed(2) + "GB";
+};
 
 // 获取所有的域的名字
-indexRouter.get('/areaAllName', (req, res) => {
+indexRouter.get("/areaAllName", (req, res) => {
   let resArr = SqlTool.getAreas(req.query.isOnlyArea === "true");
   res.send({ code: 200, data: resArr });
-})
+});
 
 // 获取指定域下的所有类的名字
-indexRouter.get('/categoryAllName', (req, res) => {
-
+indexRouter.get("/categoryAllName", (req, res) => {
   let { area } = req.query;
 
   if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
 
   let resArr = SqlTool.getCategories(area, false);
   res.send({ code: 200, data: resArr });
-})
+});
 
 // 获取随机资源项目内容（用于首页比较多）
-indexRouter.get('/itemRandom', (req, res) => {
-
+indexRouter.get("/itemRandom", (req, res) => {
   let { limit } = req.query;
 
   // 处理每页限制
   limit = parseInt(limit);
-  if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
+  if (typeof limit == "undefined" || isNaN(limit) || limit < 1) {
     return res.send({ code: 400, msg: "limit错误" });
   }
   let itemIds = SqlTool.getItemId();
@@ -57,9 +54,9 @@ indexRouter.get('/itemRandom', (req, res) => {
   let resArr = [];
   while (true) {
     // 从最大数量中获取随机数
-    let index = itemIds.length * Math.random() << 0;
+    let index = (itemIds.length * Math.random()) << 0;
     // 在封装对象之前先判断返回对象是否包含了该项，包含了则跳过
-    if (resArr.map(i => i.id).includes(itemIds[index])) {
+    if (resArr.map((i) => i.id).includes(itemIds[index])) {
       continue;
     }
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
@@ -68,24 +65,24 @@ indexRouter.get('/itemRandom', (req, res) => {
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
       source_url: itemObj.sources_url,
-      link_url: itemObj.link_url
+      link_url: itemObj.link_url,
     });
 
     if (resArr.length == limit) break;
   }
-  res.send({ code: 200, data: resArr })
-})
+  res.send({ code: 200, data: resArr });
+});
 
 // 获取指定域的随机内容
-indexRouter.get('/areaRandom', (req, res) => {
+indexRouter.get("/areaRandom", (req, res) => {
   // 获取请求参数
   let { area, limit } = req.query;
 
   if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
 
   // 字符串数据处理
-  limit = parseInt(limit)
-  if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
+  limit = parseInt(limit);
+  if (typeof limit == "undefined" || isNaN(limit) || limit < 1) {
     return res.send({ code: 400, msg: "limit错误" });
   }
 
@@ -100,13 +97,13 @@ indexRouter.get('/areaRandom', (req, res) => {
   let resArr = [];
   while (true) {
     // 从最大数量中获取随机数
-    let index = itemIds.length * Math.random() << 0;
+    let index = (itemIds.length * Math.random()) << 0;
     // 判断是否右要排除在外的资源项目（场景：避免某资源项目下的随机项目和本身相同）
     if (req.query.excludeID && itemIds[index] == req.query.excludeID) {
       continue;
     }
     // 在封装对象之前先判断返回对象是否包含了该项，包含了则跳过
-    if (resArr.map(i => i.id).includes(itemIds[index])) {
+    if (resArr.map((i) => i.id).includes(itemIds[index])) {
       continue;
     }
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
@@ -115,15 +112,15 @@ indexRouter.get('/areaRandom', (req, res) => {
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
       source_url: itemObj.sources_url,
-      link_url: itemObj.link_url
+      link_url: itemObj.link_url,
     });
     if (resArr.length == limit) break;
   }
   res.send({ code: 200, data: resArr });
-})
+});
 
 // 获取指定域的所有内容
-indexRouter.get('/areaNormal', (req, res) => {
+indexRouter.get("/areaNormal", (req, res) => {
   // 获取请求参数
   let { area, limit, page, msgType } = req.query;
 
@@ -133,10 +130,10 @@ indexRouter.get('/areaNormal', (req, res) => {
   limit = parseInt(limit);
   page = parseInt(page);
   // 检测 limit 和 page 的合理性
-  if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
+  if (typeof limit == "undefined" || isNaN(limit) || limit < 1) {
     return res.send({ code: 400, msg: "limit错误" });
   }
-  if (typeof (page) == "undefined" || isNaN(page) || page < 1) {
+  if (typeof page == "undefined" || isNaN(page) || page < 1) {
     return res.send({ code: 400, msg: "page错误" });
   }
 
@@ -172,7 +169,7 @@ indexRouter.get('/areaNormal', (req, res) => {
         intro: readObj.intro,
         type: readObj.type,
         amount: readObj.amount,
-        size: sizeFormat(readObj.size)
+        size: sizeFormat(readObj.size),
       });
     else
       resArr.push({
@@ -187,11 +184,11 @@ indexRouter.get('/areaNormal', (req, res) => {
     sources_url = "";
   }
 
-  res.send({ code: 200, data: { resArr, page, total } })
-})
+  res.send({ code: 200, data: { resArr, page, total } });
+});
 
 // 获取指定域下分类中的随机内容
-indexRouter.get('/categoryRandom', (req, res) => {
+indexRouter.get("/categoryRandom", (req, res) => {
   // 获取请求参数
   let { area, category, limit } = req.query;
 
@@ -201,7 +198,7 @@ indexRouter.get('/categoryRandom', (req, res) => {
   // 字符串数据处理
   limit = parseInt(limit);
   // 检测limit的合理性
-  if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
+  if (typeof limit == "undefined" || isNaN(limit) || limit < 1) {
     return res.send({ code: 400, msg: "limit错误" });
   }
 
@@ -217,9 +214,9 @@ indexRouter.get('/categoryRandom', (req, res) => {
 
   while (true) {
     // 从最大数量中获取随机数
-    let index = itemIds.length * Math.random() << 0;
+    let index = (itemIds.length * Math.random()) << 0;
     // 判断封装数组是否重复
-    if (resArr.map(i => i.id).includes(itemIds[index])) {
+    if (resArr.map((i) => i.id).includes(itemIds[index])) {
       continue;
     }
 
@@ -229,17 +226,17 @@ indexRouter.get('/categoryRandom', (req, res) => {
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
       title: itemObj.title,
-      url: basePath
+      url: basePath,
     });
 
     if (resArr.length == limit) break;
   }
 
   res.send({ code: 200, data: resArr });
-})
+});
 
 // 获取指定域下分类中的所有内容
-indexRouter.get('/categoryNormal', (req, res) => {
+indexRouter.get("/categoryNormal", (req, res) => {
   // 获取请求参数
   let { area, category, limit, page, msgType } = req.query;
 
@@ -249,12 +246,12 @@ indexRouter.get('/categoryNormal', (req, res) => {
 
   // 字符串数据处理
   limit = parseInt(limit);
-  page = parseInt(page)
+  page = parseInt(page);
   // 检测limit和page的合理性
-  if (typeof (limit) == "undefined" || isNaN(limit) || limit < 1) {
+  if (typeof limit == "undefined" || isNaN(limit) || limit < 1) {
     return res.send({ code: 400, msg: "limit错误" });
   }
-  if (typeof (page) == "undefined" || isNaN(page) || page < 1) {
+  if (typeof page == "undefined" || isNaN(page) || page < 1) {
     return res.send({ code: 400, msg: "page错误" });
   }
 
@@ -295,7 +292,7 @@ indexRouter.get('/categoryNormal', (req, res) => {
         intro: readObj.intro,
         type: readObj.type,
         amount: readObj.amount,
-        size: sizeFormat(readObj.size)
+        size: sizeFormat(readObj.size),
       });
     else
       resArr.push({
@@ -310,11 +307,11 @@ indexRouter.get('/categoryNormal', (req, res) => {
     sources_url = "";
   }
 
-  res.send({ code: 200, data: { resArr, page, total } })
-})
+  res.send({ code: 200, data: { resArr, page, total } });
+});
 
 // 获取指定 id 资源项目内容
-indexRouter.get('/item', (req, res) => {
+indexRouter.get("/item", (req, res) => {
   let { area, category, id } = req.query;
 
   // 检测资源目录id是否存在
@@ -331,7 +328,11 @@ indexRouter.get('/item', (req, res) => {
   let template = SqlTool.getItemShowTempalte(area, category);
   if (!template) {
     // 如果模板不存在则反馈给前端
-    return res.send({ code: 400, data: { type: "no-Template", msg: "未设置模板" } })
+    return res.send({
+      code: 400,
+      msg: "未设置模板",
+      data: { type: "no-Template" },
+    });
   }
 
   let readObj = SqlTool.getItemMsg(id);
@@ -341,24 +342,26 @@ indexRouter.get('/item', (req, res) => {
   delete readObj.custom_cover;
 
   if (readObj.sources_url) {
-    let configPath = '.' + readObj.sources_url + 'item.config.json';
+    let configPath = "." + readObj.sources_url + "item.config.json";
     if (fs.existsSync(configPath)) {
       // 读取配置信息
       let readConfigObj = JSON.parse(fs.readFileSync(configPath));
       // 移除配置文件，避免出现在返回的信息中
-      let spliceIndex = readConfigObj.files.indexOf('item.config.json');
-      if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
-      readObj.files = readConfigObj.files;
+      // let spliceIndex = readConfigObj.files.indexOf("item.config.json");
+      // if (spliceIndex > -1) readConfigObj.files.splice(spliceIndex, 1);
+      let index = readConfigObj.files_detail.findIndex((f) => f.target === "item.config.json");
+      if (index > -1) readConfigObj.files_detail.splice(index, 1);
+      readObj.files_detail = readConfigObj.files_detail;
     } else {
       // 不存在则进行扫描操作
     }
   }
 
   res.send({ code: 200, data: readObj });
-})
+});
 
 // 生成导航路径
-indexRouter.get('/acPath', (req, res) => {
+indexRouter.get("/acPath", (req, res) => {
   let { area, category } = req.query;
 
   if (!SqlTool.findCategory(area, category)) {
@@ -369,7 +372,43 @@ indexRouter.get('/acPath', (req, res) => {
   let areaObj = SqlTool.getAreaMsg(area);
   let categoryObj = SqlTool.getCategoryMsg(area, category);
 
-  res.send({ code: 200, data: { area: areaObj.area, area_web_name: areaObj.web_name, category: categoryObj.category, category_web_name: categoryObj.web_name } });
-})
+  res.send({
+    code: 200,
+    data: {
+      area: areaObj.area,
+      area_web_name: areaObj.web_name,
+      category: categoryObj.category,
+      category_web_name: categoryObj.web_name,
+    },
+  });
+});
+
+// 生成导航路径
+indexRouter.post("/getFolderFiles", (req, res) => {
+  let folderPath = req.body.path;
+  if (folderPath.indexOf("/") === 0) folderPath = "." + folderPath;
+
+  if (fs.existsSync(folderPath)) {
+    let data = { details: [] };
+    let scanArr = fs.readdirSync(folderPath);
+    scanArr.forEach((file) => {
+      stat = fs.lstatSync(`${folderPath}/${file}`);
+      data.details.push({
+        target: file,
+        name: stat.isDirectory() ? file : path.basename(file, path.extname(file)),
+        type: stat.isDirectory() ? "directory" : "file",
+        ext: stat.isDirectory() ? null : path.extname(file),
+        path: `${folderPath.substr(1)}/${file}`,
+      });
+    });
+
+    return res.send({
+      code: 200,
+      data,
+    });
+  } else {
+    return res.send({ code: 400, msg: "路径错误" });
+  }
+});
 
 module.exports = indexRouter;

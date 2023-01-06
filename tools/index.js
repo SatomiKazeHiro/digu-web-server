@@ -2,7 +2,7 @@ const process = require("process");
 
 const ioLog = require("./ioLog"),
   memory = require("./memory"),
-  sortAsWin = require("./sortAsWin"),
+  { sortAsWin, sortObjNameAsWin } = require("./sort"),
   { getSizeAndAmount } = require("./folderTool"),
   { sources } = require("./sqlTool");
 
@@ -12,6 +12,7 @@ let toolsLoader = function () {
   process.__tools.ioLog = ioLog;
   process.__tools.memory = memory;
   process.__tools.sortAsWin = sortAsWin;
+  process.__tools.sortObjNameAsWin = sortObjNameAsWin;
   process.__tools.getSizeAndAmount = getSizeAndAmount;
 };
 

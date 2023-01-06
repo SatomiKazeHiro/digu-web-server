@@ -12,6 +12,7 @@ if (!fs.existsSync("./config/config.json")) {
     gameFolder: [],
   };
   let data = JSON.stringify(config, null, "\t");
+  fs.mkdirSync("config");
   fs.writeFileSync("./config/config.json", data, { encoding: "utf-8" });
 }
 
