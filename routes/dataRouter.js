@@ -5,11 +5,9 @@ const express = require("express");
 const dataRouter = express.Router();
 
 const indexRouter = require("./data/indexRouter");
-const checkRouter = require("./data/checkRouter");
-const configRouter = require("./data/configRouter")
+const configRouter = require("./data/configRouter");
 
 dataRouter.use("/get", indexRouter);
-dataRouter.use("/check", checkRouter);
-dataRouter.use("/", configRouter);
+dataRouter.use("/cfg", configRouter);
 
 module.exports = dataRouter;

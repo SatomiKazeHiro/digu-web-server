@@ -8,8 +8,6 @@ if (!fs.existsSync("./config/config.json")) {
   config = {
     serverPort: 2233,
     baseArea: ["anime", "manga"],
-    doubleDeckFolder: [],
-    gameFolder: [],
   };
   let data = JSON.stringify(config, null, "\t");
   fs.mkdirSync("config");

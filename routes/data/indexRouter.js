@@ -66,6 +66,9 @@ indexRouter.get("/itemRandom", (req, res) => {
       title: itemObj.title,
       source_url: itemObj.sources_url,
       link_url: itemObj.link_url,
+      intro: itemObj.intro,
+      area_web_name: itemObj.area_web_name,
+      category_web_name: itemObj.category_web_name,
     });
 
     if (resArr.length == limit) break;
@@ -73,10 +76,16 @@ indexRouter.get("/itemRandom", (req, res) => {
   res.send({ code: 200, data: resArr });
 });
 
-// 获取指定域的随机内容
-indexRouter.get("/areaRandom", (req, res) => {
+/**
+ * 获取指定域的随机内容
+ * @param area域名
+ * @param limit 条数
+ * @param excludeId 过滤的资源id
+ * @return 消息体
+ */
+indexRouter.post("/areaRandom", (req, res) => {
   // 获取请求参数
-  let { area, limit } = req.query;
+  let { area, limit, excludeId } = req.body;
 
   if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
 
@@ -95,6 +104,7 @@ indexRouter.get("/areaRandom", (req, res) => {
 
   // 返回对象
   let resArr = [];
+  let resIds = excludeId ? [excludeId] : [];
   while (true) {
     // 从最大数量中获取随机数
     let index = (itemIds.length * Math.random()) << 0;
@@ -103,10 +113,11 @@ indexRouter.get("/areaRandom", (req, res) => {
       continue;
     }
     // 在封装对象之前先判断返回对象是否包含了该项，包含了则跳过
-    if (resArr.map((i) => i.id).includes(itemIds[index])) {
+    if (resIds.includes(itemIds[index])) {
       continue;
     }
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
+    resIds.push(itemObj.id);
     resArr.push({
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
@@ -119,10 +130,17 @@ indexRouter.get("/areaRandom", (req, res) => {
   res.send({ code: 200, data: resArr });
 });
 
-// 获取指定域的所有内容
-indexRouter.get("/areaNormal", (req, res) => {
+/**
+ * 获取指定域的所有内容
+ * @param area 域名
+ * @param limit 条数
+ * @param page 页数
+ * @param msgType 详情数量
+ * @return 消息体
+ */
+indexRouter.post("/areaNormal", (req, res) => {
   // 获取请求参数
-  let { area, limit, page, msgType } = req.query;
+  let { area, limit, page, msgType } = req.body;
 
   if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
 
@@ -159,7 +177,7 @@ indexRouter.get("/areaNormal", (req, res) => {
     readObj = SqlTool.getItemMsg(iIdArr[i]);
     link_url = `/${readObj.area}/${readObj.category}/${readObj.id}`;
     sources_url = `/sources/${readObj.area}/${readObj.category}/${readObj.item}`;
-    if (msgType === "all")
+    if (msgType === "rich")
       resArr.push({
         id: readObj.id,
         cover: readObj.custom_cover ? readObj.custom_cover : readObj.cover,
@@ -184,7 +202,7 @@ indexRouter.get("/areaNormal", (req, res) => {
     sources_url = "";
   }
 
-  res.send({ code: 200, data: { resArr, page, total } });
+  res.send({ code: 200, data: { data: resArr, page, total } });
 });
 
 // 获取指定域下分类中的随机内容
@@ -221,7 +239,6 @@ indexRouter.get("/categoryRandom", (req, res) => {
     }
 
     let itemObj = SqlTool.getItemMsg(itemIds[index]);
-    console.log(itemObj);
     resArr.push({
       id: itemObj.id,
       cover: itemObj.custom_cover ? itemObj.custom_cover : itemObj.cover,
@@ -235,10 +252,18 @@ indexRouter.get("/categoryRandom", (req, res) => {
   res.send({ code: 200, data: resArr });
 });
 
-// 获取指定域下分类中的所有内容
-indexRouter.get("/categoryNormal", (req, res) => {
+/**
+ * 获取指定域下分类中的所有内容
+ * @param area 域名
+ * @param category 类名
+ * @param limit 条数
+ * @param page 页数
+ * @param msgType 详情数量
+ * @return 消息体
+ */
+indexRouter.post("/categoryNormal", (req, res) => {
   // 获取请求参数
-  let { area, category, limit, page, msgType } = req.query;
+  let { area, category, limit, page, msgType } = req.body;
 
   if (!SqlTool.findArea(area)) {
     return res.send({ code: 400, msg: "area错误" });
@@ -307,12 +332,18 @@ indexRouter.get("/categoryNormal", (req, res) => {
     sources_url = "";
   }
 
-  res.send({ code: 200, data: { resArr, page, total } });
+  res.send({ code: 200, data: { data: resArr, page, total } });
 });
 
-// 获取指定 id 资源项目内容
-indexRouter.get("/item", (req, res) => {
-  let { area, category, id } = req.query;
+/**
+ * 获取指定 id 资源项目内容
+ * @param area 域名
+ * @param category 类名
+ * @param resourceId 资源id
+ * @return 消息体
+ */
+indexRouter.post("/item", (req, res) => {
+  let { area, category, resourceId: id } = req.body;
 
   // 检测资源目录id是否存在
   if (!SqlTool.findItem(id)) {

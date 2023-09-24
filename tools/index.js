@@ -1,13 +1,13 @@
 const process = require("process");
 
-const ioLog = require("./ioLog"),
+const ioLog = require("./io-log"),
   memory = require("./memory"),
   { sortAsWin, sortObjNameAsWin } = require("./sort"),
-  { getSizeAndAmount } = require("./folderTool"),
+  { getSizeAndAmount } = require("./folder-tool"),
   { sources } = require("./sqlTool");
 
 // 工具
-let toolsLoader = function () {
+let toolsLoader = () => {
   process.__tools = new Object();
   process.__tools.ioLog = ioLog;
   process.__tools.memory = memory;
@@ -17,7 +17,7 @@ let toolsLoader = function () {
 };
 
 // 数据库
-let sqlLoader = function () {
+let sqlLoader = () => {
   process.__sql = new Object();
   process.__sql.SOURCES_SQL_TOOL = sources;
 };

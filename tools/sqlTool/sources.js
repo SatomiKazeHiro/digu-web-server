@@ -87,8 +87,12 @@ module.exports = class SourcesDB {
     );
     let itemObj = readItemMsg.get(id);
     delete itemObj["id:1"];
+    let areaObj = this.getAreaMsg(itemObj.area) || {};
+    let categoryObj = this.getCategoryMsg(itemObj.area, itemObj.category) || {};
     itemObj.link_url = `/${itemObj.area}/${itemObj.category}/${itemObj.id}`;
     itemObj.sources_url = `/sources/${itemObj.area}/${itemObj.category}/${itemObj.item}/`;
+    itemObj.area_web_name = areaObj.web_name;
+    itemObj.category_web_name = categoryObj.web_name;
     return itemObj;
   }
 
@@ -252,12 +256,9 @@ module.exports = class SourcesDB {
    * 用于重置所有表的 init 字段为 0，检测到资源的时候设置为 1，当服务器初始化完成后，还是 0 的数据将清除
    */
   static setInitFalse() {
-    const setArea = db.prepare(`update areas_index set init = 0`);
-    const setCategory = db.prepare(`update categories_index set init = 0`);
-    const setItem = db.prepare(`update items_index set init = 0`);
-    setArea.run();
-    setCategory.run();
-    setItem.run();
+    db.prepare(`update areas_index set init = 0`).run();
+    db.prepare(`update categories_index set init = 0`).run();
+    db.prepare(`update items_index set init = 0`).run();
   }
 
   /**
