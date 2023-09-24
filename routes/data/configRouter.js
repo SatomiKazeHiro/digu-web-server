@@ -19,7 +19,7 @@ configRouter.use(bodyParser.json());
 configRouter.use(bodyParser.urlencoded({ extended: false }));
 
 // 生成目录树
-configRouter.get("/get/logtree", (req, res) => {
+configRouter.get("/getLogtree", (req, res) => {
   let resArr = [];
   SqlTool.getAreas(false).forEach((i) => {
     i.children = [];
@@ -37,7 +37,7 @@ configRouter.get("/get/logtree", (req, res) => {
 });
 
 // 获取 area 的配置信息
-configRouter.get("/get/areaIndex", (req, res) => {
+configRouter.get("/getAreaIndex", (req, res) => {
   if (req.query.area) {
     let resObj = SqlTool.getAreaMsg(req.query.area);
     res.send({ code: 200, data: resObj });
@@ -45,7 +45,7 @@ configRouter.get("/get/areaIndex", (req, res) => {
 });
 
 // 获取 category 的配置信息
-configRouter.get("/get/categoryIndex", (req, res) => {
+configRouter.get("/getCategoryIndex", (req, res) => {
   if (!req.query.area) res.send({ code: 400, msg: "area为空" });
   else if (!req.query.category) res.send({ code: 400, msg: "category为空" });
   else {
@@ -55,7 +55,7 @@ configRouter.get("/get/categoryIndex", (req, res) => {
 });
 
 // 设置 area
-configRouter.post("/set/areaIndex", (req, res) => {
+configRouter.post("/setAreaIndex", (req, res) => {
   if (req.body) {
     if (SqlTool.update("areas_index", req.body)) {
       res.send({ code: 200 });
@@ -64,7 +64,7 @@ configRouter.post("/set/areaIndex", (req, res) => {
 });
 
 // 设置 category
-configRouter.post("/set/categoryIndex", (req, res) => {
+configRouter.post("/setCategoryIndex", (req, res) => {
   if (req.body) {
     if (SqlTool.update("categories_index", req.body)) {
       res.send({ code: 200 });
@@ -73,7 +73,7 @@ configRouter.post("/set/categoryIndex", (req, res) => {
 });
 
 // 获取资源合法性
-configRouter.post("/get/sourecesValidity", (req, res) => {
+configRouter.post("/getSourecesValidity", (req, res) => {
   console.log("/get/sourecesValidity", req.body);
   if (req.body) {
     let bool = null;
