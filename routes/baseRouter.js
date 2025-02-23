@@ -5,16 +5,14 @@ const express = require("express");
 const baseRouter = express.Router();
 
 // 中间件
-let { baseMiddleware } = require('../middleware');
+let { baseMiddleware } = require("../middleware");
 
-
-baseRouter.get('/', baseMiddleware, (req, res) => {
+baseRouter.get("/", baseMiddleware, (req, res) => {
   res.send("hello, express.");
-})
+});
 
-baseRouter.get('/404', baseMiddleware, (req, res) => {
+baseRouter.get("/404", baseMiddleware, (req, res) => {
   res.send("404");
-})
-
+});
 
 module.exports = baseRouter;

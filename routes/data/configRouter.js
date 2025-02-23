@@ -7,7 +7,7 @@ const express = require("express");
 const configRouter = express.Router();
 
 // 路由中间件
-const { dataMiddleware } = require("../../middleware");
+// const { dataMiddleware } = require("../../middleware");
 
 // 资源数据库工具
 const SqlTool = process.__sql.SOURCES_SQL_TOOL;

@@ -1,10 +1,7 @@
 # 忽略git上传的目录
 node_modules/
 dist/
-sources/
-logs/
-cache/*.json
-*.db
+
 
 # local env files
 .env.local
@@ -24,3 +21,15 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# 资源目录
+resources/
+# 日志
+logs/
+# 配置
+configs/
+# 数据文件
+/db/
+*.db
+# 其他
+oldFiles/

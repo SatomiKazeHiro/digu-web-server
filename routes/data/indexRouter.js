@@ -28,15 +28,15 @@ indexRouter.get("/areaAllName", (req, res) => {
   res.send({ code: 200, data: resArr });
 });
 
-// 获取指定域下的所有类的名字
-indexRouter.get("/categoryAllName", (req, res) => {
-  let { area } = req.query;
+// // 获取指定域下的所有类的名字
+// indexRouter.get("/categoryAllName", (req, res) => {
+//   let { area } = req.query;
 
-  if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
+//   if (!SqlTool.findArea(area)) return res.send({ code: 400, msg: "area错误" });
 
-  let resArr = SqlTool.getCategories(area, false);
-  res.send({ code: 200, data: resArr });
-});
+//   let resArr = SqlTool.getCategories(area, false);
+//   res.send({ code: 200, data: resArr });
+// });
 
 // 获取随机资源项目内容（用于首页比较多）
 indexRouter.get("/itemRandom", (req, res) => {
