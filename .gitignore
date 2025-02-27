@@ -29,6 +29,7 @@ logs/
 # 配置
 configs/
 # 数据文件
+database/
 /db/
 *.db
 # 其他
